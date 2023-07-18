@@ -1,0 +1,20 @@
+[
+  {
+    "id": 2,
+    "title": "Mike",
+    "description": "Figura 3D Mike",
+    "price": 8000,
+    "thumbnail": "../img/Series/Mike.gif",
+    "code": "S02",
+    "stock": 8
+  },
+  {
+    "id": 3,
+    "title": "Boa Hancock",
+    "description": "Figura 3D Boa Hancock",
+    "price": 5000,
+    "thumbnail": "../img/Anime/BoaHancock.gif",
+    "code": "A01",
+    "stock": 10
+  }
+]
