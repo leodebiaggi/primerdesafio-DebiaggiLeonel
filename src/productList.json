@@ -1,0 +1,92 @@
+[
+  {
+    "id": 1,
+    "title": "Mr White",
+    "description": "Figura 3D Mr White",
+    "price": 10000,
+    "thumbnail": "NO IMAGE",
+    "code": "S01",
+    "stock": 5
+  },
+  {
+    "id": 2,
+    "title": "Mike",
+    "description": "Figura 3D Mike",
+    "price": 8000,
+    "thumbnail": "NO IMAGE",
+    "code": "S02",
+    "stock": 8
+  },
+  {
+    "id": 3,
+    "title": "Boa Hancock",
+    "description": "Figura 3D Boa Hancock",
+    "price": 5000,
+    "thumbnail": "NO IMAGE",
+    "code": "A01",
+    "stock": 10
+  },
+  {
+    "id": 4,
+    "title": "Gus Fring",
+    "description": "Figura 3D Gus Fring",
+    "price": 7000,
+    "thumbnail": "NO IMAGE",
+    "code": "S03",
+    "stock": 7
+  },
+  {
+    "id": 5,
+    "title": "Héctor Salamanca",
+    "description": "Figura 3D Hector",
+    "price": 5000,
+    "thumbnail": "NO IMAGE",
+    "code": "S04",
+    "stock": 8
+  },
+  {
+    "id": 6,
+    "title": "Bea",
+    "description": "Figura 3D Bea",
+    "price": 5000,
+    "thumbnail": "NO IMAGE",
+    "code": "A02",
+    "stock": 12
+  },
+  {
+    "id": 7,
+    "title": "Saul Goodman",
+    "description": "Figura 3D Saul Goodman",
+    "price": 9000,
+    "thumbnail": "NO IMAGE",
+    "code": "S05",
+    "stock": 4
+  },
+  {
+    "id": 8,
+    "title": "Lisa",
+    "description": "Figura 3D Lisa",
+    "price": 7000,
+    "thumbnail": "NO IMAGE",
+    "code": "A03",
+    "stock": 11
+  },
+  {
+    "id": 9,
+    "title": "Marnie",
+    "description": "Figura 3D Marnie",
+    "price": 4000,
+    "thumbnail": "NO IMAGE",
+    "code": "A04",
+    "stock": 14
+  },
+  {
+    "id": 10,
+    "title": "Nessa",
+    "description": "Figura 3D Nessa",
+    "price": 3000,
+    "thumbnail": "NO IMAGE",
+    "code": "A05",
+    "stock": 20
+  }
+]

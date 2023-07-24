@@ -1,4 +1,4 @@
-const fs = require('fs-extra');
+import fs from 'fs';
 const filePath = 'productList.json';
 
 if (!fs.existsSync(filePath)) {
@@ -30,7 +30,7 @@ class ProductManager {
     // Cargar productos desde el archivo JSON al iniciar la aplicación  
     async loadProducts() {
         try {
-            const data = await fs.readFile(filePath, 'utf-8');
+            const data = await fs.promises.readFile(filePath, 'utf-8');
             if (data.trim() === '') {
                 this.products = [];
             } else {
@@ -45,7 +45,7 @@ class ProductManager {
     // Guardar productos en el archivo JSON
     async saveProducts() {
         try {
-            await fs.writeFile(filePath, JSON.stringify(this.products, null, 2), 'utf-8');
+            await fs.promises.writeFile(filePath, JSON.stringify(this.products, null, 2), 'utf-8');
             console.log(`Los productos se guardaron correctamente en el archivo: ${filePath}`);
         } catch (error) {
             console.log(`Ocurrió un error al guardar los productos: ${error.message}`);
@@ -142,7 +142,7 @@ class ProductManager {
     }
 }
 
-    // Función de prueba para chequear las distintas funciones
+ /* // Función de prueba para chequear las distintas funciones
     async function Prueba() {
     const productManagerInstance = new ProductManager();
 
@@ -152,9 +152,16 @@ class ProductManager {
 
     //Se agregan los productos
     console.log("Agregado de productos:");
-    productManagerInstance.addProduct('Mr White', 'Figura 3D Mr White', 10000, '../img/Series/MrWhite.gif', 'S01', 5);
-    productManagerInstance.addProduct('Mike', 'Figura 3D Mike', 7000, '../img/Series/Mike.gif', 'S02', 8);
-    productManagerInstance.addProduct('Boa Hancock', 'Figura 3D Boa Hancock', 5000, '../img/Anime/BoaHancock.gif', 'A01', 10);
+    productManagerInstance.addProduct('Mr White', 'Figura 3D Mr White', 10000, 'NO IMAGE', 'S01', 5);
+    productManagerInstance.addProduct('Mike', 'Figura 3D Mike', 7000, 'NO IMAGE', 'S02', 8);
+    productManagerInstance.addProduct('Boa Hancock', 'Figura 3D Boa Hancock', 5000, 'NO IMAGE', 'A01', 10);
+    productManagerInstance.addProduct('Gus Fring', 'Figura 3D Gus Fring', 7000, 'NO IMAGE', 'S03', 7);
+    productManagerInstance.addProduct('Héctor Salamanca', 'Figura 3D Hector', 5000, 'NO IMAGE', 'S04', 8);
+    productManagerInstance.addProduct('Bea', 'Figura 3D Bea', 5000, 'NO IMAGE', 'A02', 12);
+    productManagerInstance.addProduct('Saul Goodman', 'Figura 3D Saul Goodman', 9000, 'NO IMAGE', 'S05', 4);
+    productManagerInstance.addProduct('Lisa', 'Figura 3D Lisa', 7000, 'NO IMAGE', 'A03', 11);
+    productManagerInstance.addProduct('Marnie', 'Figura 3D Marnie', 4000, 'NO IMAGE', 'A04', 14);
+    productManagerInstance.addProduct('Nessa', 'Figura 3D Nessa', 3000, 'NO IMAGE', 'A05', 20);
 
     //Mostrar listado de productos agregados
     console.log("Listado de productos agregados");
@@ -183,4 +190,6 @@ class ProductManager {
     console.log(productManagerInstance.getProducts());
 }
 
-Prueba();
+Prueba();*/
+
+export {ProductManager}
