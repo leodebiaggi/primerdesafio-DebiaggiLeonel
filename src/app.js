@@ -3,13 +3,9 @@ import { ProductManager} from './productManager.js';
 
 const app = express ();
 
-app.listen(8080, () => {
-    console.log(`Server Express listen port 8080`);
-});
-
 app.use(express.urlencoded({extended:true}))
 
-const productManagerInstance = new ProductManager('./productList.json')
+const productManagerInstance = new ProductManager('./src/productList.json')
 
 //Mensaje de bienvenida al inicio
 app.get('/', (req, res) => {
@@ -47,4 +43,8 @@ app.get('/products/:pid', async (req, res) => {
     } catch (error) {
       res.status(500).json({ error: 'Hubo un error al obtener el producto solicitado.' });
     }
+});
+
+app.listen(8080, () => {
+  console.log(`Server Express listen port 8080`);
 });

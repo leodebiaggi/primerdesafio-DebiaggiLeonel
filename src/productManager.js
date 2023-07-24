@@ -142,7 +142,8 @@ class ProductManager {
     }
 }
 
- /* // Función de prueba para chequear las distintas funciones
+/*
+    //Función de prueba para chequear las distintas funciones
     async function Prueba() {
     const productManagerInstance = new ProductManager();
 
