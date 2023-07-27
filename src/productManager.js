@@ -95,7 +95,7 @@ class ProductManager {
     }
 
     // Actualizar el precio de un producto por su ID
-    async updateProductPrice(id, updatedPrice) {
+    async updateProduct (id, updatedPrice) {
         try {
             const productToUpdate = this.products.find((product) => product.id === id);
             if (!productToUpdate) {
@@ -180,7 +180,7 @@ class ProductManager {
     //Actualización de precio de producto ingresando un ID
     console.log("Actualización de precio de un producto por ID:");
     const productIdToUpdate = 2;
-    await productManagerInstance.updateProductPrice(productIdToUpdate, 8000);
+    await productManagerInstance.updateProduct(productIdToUpdate, 8000);
 
     //Eliminación de producto específico por ID
     console.log("Eliminación de un producto por ID:");
