@@ -8,7 +8,7 @@ if (!fs.existsSync(filePath)) {
 
 // Class producto individual
 class Product {
-    constructor(id, title, description, price, thumbnail, code, stock) {
+    constructor(id, title, description, price, thumbnail, code, stock, category) {
         this.id = id;
         this.title = title;
         this.description = description;
@@ -16,6 +16,7 @@ class Product {
         this.thumbnail = thumbnail;
         this.code = code;
         this.stock = stock;
+        this.category = category;
     }
 }
 
@@ -34,7 +35,7 @@ class ProductManager {
             if (data.trim() === '') {
                 this.products = [];
             } else {
-                this.products = JSON.parse(data).map((productData) => new Product(productData.id, productData.title, productData.description, productData.price, productData.thumbnail, productData.code, productData.stock));
+                this.products = JSON.parse(data).map((productData) => new Product(productData.id, productData.title, productData.description, productData.price, productData.thumbnail, productData.code, productData.stock, productData.category));
                 this.updateLastProductId();
             }
         } catch (error) {
@@ -53,9 +54,9 @@ class ProductManager {
     }
 
     // Agregar un nuevo producto
-    addProduct(title, description, price, thumbnail, code, stock) {
+    addProduct(title, description, price, thumbnail, code, stock, category) {
         try {
-            if (![title, description, price, thumbnail, code, stock].every(Boolean)) {
+            if (![title, description, price, thumbnail, code, stock, category].every(Boolean)) {
                 throw new Error('Todos los campos son obligatorios para agregar un producto.');
             }
 
@@ -64,7 +65,7 @@ class ProductManager {
             }
 
             this.currentId++;
-            const newProduct = new Product(this.currentId, title, description, price, thumbnail, code, stock);
+            const newProduct = new Product(this.currentId, title, description, price, thumbnail, code, stock, category);
             this.products.push(newProduct);
 
             this.saveProducts(); // Guardar los productos actualizados
@@ -95,21 +96,23 @@ class ProductManager {
     }
 
     // Actualizar el precio de un producto por su ID
-    async updateProduct (id, updatedPrice) {
-        try {
-            const productToUpdate = this.products.find((product) => product.id === id);
-            if (!productToUpdate) {
-                throw new Error(`Producto con ID ${id} no encontrado`);
-            }
-            productToUpdate.price = updatedPrice;
-            await this.saveProducts();
-            this.updateLastProductId();
-            console.log(`Se actualizó el precio del producto: ${JSON.stringify(productToUpdate)}`);
-        } catch (error) {
-            console.error(`Error al actualizar el precio del producto: ${error.message}`);
+    async updateProduct(id, updatedFields) {
+        const productToUpdate = this.products.find((p) => p.id === id);
+        if (!productToUpdate) {
+          console.log(`Producto con id ${id} no encontrado`);
+          return;
         }
-    }
-
+    
+        Object.assign(productToUpdate, updatedFields);
+    
+        await this.saveProducts(this.products)
+          .then(() => {
+            console.log(`Se actualiza el producto: ${JSON.stringify(productToUpdate)}`);
+          })
+          .catch((error) => {
+            console.log('Error al guardar los productos', error.message);
+          });
+      }
 
     // Eliminar un producto por su ID
     async deleteProductById(id) {
@@ -141,56 +144,5 @@ class ProductManager {
         }
     }
 }
-
-/*
-    //Función de prueba para chequear las distintas funciones
-    async function Prueba() {
-    const productManagerInstance = new ProductManager();
-
-    //Mostrar el array vacío al inicio
-    console.log("Array vacío al inicio:");
-    console.log(productManagerInstance.getProducts());
-
-    //Se agregan los productos
-    console.log("Agregado de productos:");
-    productManagerInstance.addProduct('Mr White', 'Figura 3D Mr White', 10000, 'NO IMAGE', 'S01', 5);
-    productManagerInstance.addProduct('Mike', 'Figura 3D Mike', 7000, 'NO IMAGE', 'S02', 8);
-    productManagerInstance.addProduct('Boa Hancock', 'Figura 3D Boa Hancock', 5000, 'NO IMAGE', 'A01', 10);
-    productManagerInstance.addProduct('Gus Fring', 'Figura 3D Gus Fring', 7000, 'NO IMAGE', 'S03', 7);
-    productManagerInstance.addProduct('Héctor Salamanca', 'Figura 3D Hector', 5000, 'NO IMAGE', 'S04', 8);
-    productManagerInstance.addProduct('Bea', 'Figura 3D Bea', 5000, 'NO IMAGE', 'A02', 12);
-    productManagerInstance.addProduct('Saul Goodman', 'Figura 3D Saul Goodman', 9000, 'NO IMAGE', 'S05', 4);
-    productManagerInstance.addProduct('Lisa', 'Figura 3D Lisa', 7000, 'NO IMAGE', 'A03', 11);
-    productManagerInstance.addProduct('Marnie', 'Figura 3D Marnie', 4000, 'NO IMAGE', 'A04', 14);
-    productManagerInstance.addProduct('Nessa', 'Figura 3D Nessa', 3000, 'NO IMAGE', 'A05', 20);
-
-    //Mostrar listado de productos agregados
-    console.log("Listado de productos agregados");
-    console.log(productManagerInstance.getProducts());
-
-    //Búsqueda de productos by ID
-    console.log("Busqueda de producto:");
-    const productId = 2;
-    const productById = productManagerInstance.getProductById(productId);
-    if (productById) {
-        console.log(`Producto encontrado por ID: ${productId}`);
-        console.log(productById);
-    }
-
-    //Actualización de precio de producto ingresando un ID
-    console.log("Actualización de precio de un producto por ID:");
-    const productIdToUpdate = 2;
-    await productManagerInstance.updateProduct(productIdToUpdate, 8000);
-
-    //Eliminación de producto específico por ID
-    console.log("Eliminación de un producto por ID:");
-    const productIdToDelete = 1;
-    await productManagerInstance.deleteProductById(productIdToDelete);
-
-    console.log("Listado de productos después de eliminar y actualizar:");
-    console.log(productManagerInstance.getProducts());
-}
-
-Prueba();*/
 
 export {ProductManager}
