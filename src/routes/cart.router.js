@@ -12,7 +12,7 @@ router.post('/', (req, res) => {
 
 // GET - Listar productos de un carrito
 router.get('/:cid', async (req, res) => {
-  const cartId = parseInt(req.params.cid);
+  const cartId = +req.params.cid; // Se reemplaza parseInt(req.params.cid);
   const cart = await cartManagerInstance.getCartById(cartId);
 
   if (!cart) {
@@ -24,15 +24,11 @@ router.get('/:cid', async (req, res) => {
 
 // POST - Agregar producto a carrito
 router.post('/:cid/product/:pid', async (req, res) => {
-  const cartId = parseInt(req.params.cid);
-  const productId = parseInt(req.params.pid);
-  const { quantity } = req.body;
+  const cartId = +req.params.cid;
+  const productId = +req.params.pid;
 
-  if (!quantity || isNaN(quantity)) {
-    return res.status(400).json({ error: 'La cantidad no es validad' });
-  }
+  const cart = cartManagerInstance.addProductToCart(cartId, productId, 1); // Siempre se agregara un producto con cantidad 1
 
-  const cart = cartManagerInstance.addProductToCart(cartId, productId, quantity);
   if (!cart) {
     return res.status(404).json({ error: 'El carrito no fue encontrado' });
   }

@@ -7,7 +7,7 @@ const productManagerInstance = new ProductManager();
 // Ruta raíz GET /api/products/
 router.get('/', async (req, res) => {
   try {
-    const products = await productManagerInstance.getProducts();
+    const products = productManagerInstance.getProducts(); // Se quita el metodo innecesario await
     const limit = req.query.limit ? parseInt(req.query.limit) : null;
     const response = limit ? products.slice(0, limit) : products;
     res.json(response);
@@ -80,7 +80,7 @@ router.put('/:pid', async (req, res) => {
 // Ruta DELETE /api/products/:pid
 router.delete('/:pid', async (req, res) => {
   try {
-    const productId = parseInt(req.params.pid);
+    const productId = +req.params.pid; // Reemplaza el parseInt(req.params.pid);
     const product = await productManagerInstance.getProductById(productId);
     if (!product) {
       return res.status(404).json({ error: 'No se ha encontrado el producto que intentas eliminar.' });
