@@ -54,11 +54,11 @@ class ProductManager {
     }
 
     // Agregar un nuevo producto
-    addProduct(title, description, price, thumbnail, code, stock, category) {
+    addProduct(title, description, price, code, stock, category, thumbnail) {
         try {
-            if (![title, description, price, thumbnail, code, stock, category].every(Boolean)) {
-                throw new Error('Todos los campos son obligatorios para agregar un producto.');
-            }
+            /*if (![title, description, price, thumbnail, code, stock, category].every(Boolean)) {
+              throw new Error('Todos los campos son obligatorios para agregar un producto.');
+            }*/
 
             if (this.products.some((p) => p.code === code)) {
                 throw new Error(`El producto con el código '${code}' ya existe.`);
@@ -99,20 +99,20 @@ class ProductManager {
     async updateProduct(id, updatedFields) {
         const productToUpdate = this.products.find((p) => p.id === id);
         if (!productToUpdate) {
-          console.log(`Producto con id ${id} no encontrado`);
-          return;
+            console.log(`Producto con id ${id} no encontrado`);
+            return;
         }
-    
+
         Object.assign(productToUpdate, updatedFields);
-    
+
         await this.saveProducts(this.products)
-          .then(() => {
-            console.log(`Se actualiza el producto: ${JSON.stringify(productToUpdate)}`);
-          })
-          .catch((error) => {
-            console.log('Error al guardar los productos', error.message);
-          });
-      }
+            .then(() => {
+                console.log(`Se actualiza el producto: ${JSON.stringify(productToUpdate)}`);
+            })
+            .catch((error) => {
+                console.log('Error al guardar los productos', error.message);
+            });
+    }
 
     // Eliminar un producto por su ID
     async deleteProductById(id) {
@@ -145,4 +145,4 @@ class ProductManager {
     }
 }
 
-export {ProductManager}
+export { ProductManager }

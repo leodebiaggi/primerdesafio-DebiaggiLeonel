@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{__dirname}}/style.css">
+    <title>STOR3D - Lista de Productos en Tiempo Real</title>
+</head>
+
+<body>
+    <h1>Lista de Productos en Tiempo Real</h1>
+    <ul>
+        {{#each products}}
+        <li>{{this.title}} - {{this.price}}</li>
+        {{/each}}
+    </ul>
+
+<h2>Agregar Nuevo Producto</h2>
+<form id="productForm">
+    <input type="text" name="title" placeholder="Título" required>
+    <input type="text" name="description" placeholder="Descripción" required>
+    <input type="number" name="price" placeholder="Precio" required>
+    <input type="text" name="code" placeholder="Código" required>
+    <input type="number" name="stock" placeholder="Stock" required>
+    <input type="text" name="category" placeholder="Categoría" required>
+    <button type="submit">Agregar Producto</button>
+</form>
+
+    <h2>Eliminar Producto</h2>
+    <form id="deleteProductForm">
+        <select name="productId" required>
+            {{#each products}}
+            <option value="{{this.id}}">{{this.title}}</option>
+            {{/each}}
+        </select>
+        <button type="submit">Eliminar Producto</button>
+    </form>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="/js/index.js"></script>
+</body>
+
+</html>
