@@ -32,8 +32,8 @@ socketServer.on('connection', (socket) => {
   });
 
   // Manejar la eliminación de un producto
-  socket.on('deleteProduct', (id) => {
-    productManagerInstance.deleteProductById(id);
+  socket.on('deleteProduct', (productId) => {
+    productManagerInstance.deleteProductById(productId);
     const products = productManagerInstance.getProducts();
     socketServer.emit('productListUpdate', products); // Enviar actualización a todos los clientes
   });

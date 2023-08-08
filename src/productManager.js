@@ -54,7 +54,7 @@ class ProductManager {
     }
 
     // Agregar un nuevo producto
-    addProduct(title, description, price, code, stock, category, thumbnail) {
+    addProduct(title, description, price, thumbnail, code, stock, category) {
         try {
             /*if (![title, description, price, thumbnail, code, stock, category].every(Boolean)) {
               throw new Error('Todos los campos son obligatorios para agregar un producto.');

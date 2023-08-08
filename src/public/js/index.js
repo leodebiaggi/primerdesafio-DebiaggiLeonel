@@ -25,11 +25,11 @@ window.addEventListener('load', () => {
     // Eliminar producto
     document.getElementById('deleteProductForm').addEventListener('submit', (event) => {
       event.preventDefault();
-
+    
       const form = event.target;
       const formData = new FormData(form);
       const productId = formData.get('productId'); // Obtener el ID del producto seleccionado
-
+    
       fetch(`/api/products/${productId}`, {
         method: 'DELETE',
       })
@@ -40,12 +40,28 @@ window.addEventListener('load', () => {
           return response.json();
         })
         .then((data) => {
-          console.log(data.message); 
-          form.reset(); 
+          console.log(data.message);
+          form.reset();
+    
+          // Evento para actualizar la lista de productos en tiempo real
+          socketClient.emit('productListUpdate');
         })
+        
         .catch((error) => {
-          console.error(error); 
+          console.error(error);
         });
+    });
+
+    // Actualización en tiempo real de la lista de productos
+    socketClient.on('productListUpdate', (updatedProducts) => {
+      const productList = document.querySelector('ul');
+      productList.innerHTML = ''; 
+
+      updatedProducts.forEach(product => {
+        const productItem = document.createElement('li');
+        productItem.textContent = `${product.title} - ${product.price}`;
+        productList.appendChild(productItem);
+      });
     });
   });
 });

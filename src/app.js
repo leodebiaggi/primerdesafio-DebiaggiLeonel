@@ -47,7 +47,7 @@ socketServer.on('connection', (socket) => {
   console.log('Cliente conectado', socket.id);
 
   socket.on('createProduct', (data) => {
-    productManagerInstance.addProduct(data.title, data.description, data.price, data.code, data.stock, data.category);
+    productManagerInstance.addProduct(data.title, data.description, data.price, data.thumbnail, data.code, data.stock, data.category);
     const products = productManagerInstance.getProducts();
     socketServer.emit('productListUpdate', products); // Enviar actualización a todos los clientes
   });
