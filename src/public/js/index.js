@@ -25,11 +25,11 @@ window.addEventListener('load', () => {
     // Eliminar producto
     document.getElementById('deleteProductForm').addEventListener('submit', (event) => {
       event.preventDefault();
-    
+
       const form = event.target;
       const formData = new FormData(form);
       const productId = formData.get('productId'); // Obtener el ID del producto seleccionado
-    
+
       fetch(`/api/products/${productId}`, {
         method: 'DELETE',
       })
@@ -42,11 +42,11 @@ window.addEventListener('load', () => {
         .then((data) => {
           console.log(data.message);
           form.reset();
-    
+
           // Evento para actualizar la lista de productos en tiempo real
           socketClient.emit('productListUpdate');
         })
-        
+
         .catch((error) => {
           console.error(error);
         });
@@ -55,12 +55,20 @@ window.addEventListener('load', () => {
     // Actualización en tiempo real de la lista de productos
     socketClient.on('productListUpdate', (updatedProducts) => {
       const productList = document.querySelector('ul');
-      productList.innerHTML = ''; 
+      productList.innerHTML = '';
+
+      const deleteProductSelect = document.querySelector('select[name="productId"]');
+      deleteProductSelect.innerHTML = ''; 
 
       updatedProducts.forEach(product => {
         const productItem = document.createElement('li');
         productItem.textContent = `${product.title} - ${product.price}`;
         productList.appendChild(productItem);
+
+        const option = document.createElement('option');
+        option.value = product.id; 
+        option.textContent = product.title;
+        deleteProductSelect.appendChild(option);
       });
     });
   });
