@@ -1,25 +1,26 @@
 import express from 'express';
-import { ProductManager } from '../productManager.js';
+
+//import { ProductManager } from '../productManager.js';
+import { ProductManagerMongo } from '../dao/productManagerMongo.js';
 
 const router = express.Router();
-const productManagerInstance = new ProductManager();
+//const productManagerInstance = new ProductManager();
+const productManagerInstance = new ProductManagerMongo();
 
 // Ruta raíz GET /api/products/
 router.get('/', async (req, res) => {
   try {
-    const products = productManagerInstance.getProducts(); // Se quita el metodo innecesario await
-    const limit = req.query.limit ? parseInt(req.query.limit) : null;
-    const response = limit ? products.slice(0, limit) : products;
-    res.json(response);
+    const products = await productManagerInstance.getProducts();
+    res.status(200).json(products);
   } catch (error) {
-    res.status(500).json({ error: 'Error al obtener listado de productos' });
+    res.status(500).json({ error: 'Error al obtener los productos' });
   }
 });
 
 // Ruta GET /api/products/:pid
 router.get('/:pid', async (req, res) => {
   try {
-    const productId = parseInt(req.params.pid);
+    const productId = req.params.pid;
     const product = await productManagerInstance.getProductById(productId);
 
     if (!product) {
@@ -34,6 +35,7 @@ router.get('/:pid', async (req, res) => {
 
 // Ruta POST /api/products/
 router.post('/', (req, res) => {
+  //console.log('Datos de la solicitud POST:', req.body);
   const {
     title,
     description,
@@ -62,7 +64,7 @@ router.post('/', (req, res) => {
 // Ruta PUT /api/products/:pid
 router.put('/:pid', async (req, res) => {
   try {
-    const productId = parseInt(req.params.pid);
+    const productId = req.params.pid;
     const updatedProductData = req.body;
 
     if (!Object.keys(updatedProductData).length) {
@@ -80,7 +82,7 @@ router.put('/:pid', async (req, res) => {
 // Ruta DELETE /api/products/:pid
 router.delete('/:pid', async (req, res) => {
   try {
-    const productId = +req.params.pid; // Reemplaza el parseInt(req.params.pid);
+    const productId = req.params.pid;
     const product = await productManagerInstance.getProductById(productId);
     if (!product) {
       return res.status(404).json({ error: 'No se ha encontrado el producto que intentas eliminar.' });

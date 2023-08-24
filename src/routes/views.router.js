@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { ProductManager } from "../productManager.js";
 import { Server } from 'socket.io';
+import { Message } from "../dao/models/messages.models.js";
 
 const router = Router();
 const productManagerInstance = new ProductManager('./productList.json');
@@ -16,6 +17,19 @@ router.get("/realtimeproducts", (req, res) => {
   const products = productManagerInstance.getProducts();
   res.render("realtimeproducts", { products });
 });
+
+// Ruta para mostrar la vista "Chat"
+router.get("/chat", async (req, res) => {
+  try {
+      const messages = await Message.find().sort({ createdAt: 1 });
+
+      res.render("chat", { messages });
+  } catch (error) {
+      console.error("Error al obtener mensajes:", error);
+      res.status(500).send("Error al obtener mensajes");
+  }
+});
+
 
 // Inicializar el servidor de Websockets
 const socketServer = new Server();
