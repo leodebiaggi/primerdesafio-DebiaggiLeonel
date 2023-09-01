@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{__dirname}}/style.css">
+    <title>STOR3D - Lista de Productos</title>
+</head>
+
+<body>
+    <h1>Lista de Productos</h1>
+    <ul>
+        {{#each products}}
+        <li>
+            {{this.title}} - {{this.price}}
+            <a href="/api/views/products/{{this._id}}">Ver detalles</a>
+            <button class="addToCart" data-product-id="{{this._id}}">Agregar al carrito</button>
+        </li>
+        {{/each}}
+    </ul>
+
+    <script>
+        const addToCartButtons = document.querySelectorAll('.addToCart');
+        addToCartButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                const productId = button.getAttribute('data-product-id');
+            });
+        });
+    </script>
+</body>
+
+</html>
