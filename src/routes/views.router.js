@@ -4,7 +4,7 @@ import { Server } from 'socket.io';
 import { Message } from "../dao/models/messages.models.js";
 import { ProductManagerMongo } from "../dao/productManagerMongo.js";
 import Product from "../dao/models/products.model.js";
-import Cart from '../dao/models/carts.model.js'; 
+import Cart from '../dao/models/carts.model.js';
 
 const router = Router();
 //const productManagerInstance = new ProductManager('./productList.json');
@@ -38,7 +38,8 @@ router.get("/chat", async (req, res) => {
 router.get('/products', async (req, res) => {
   try {
     const products = await Product.find();
-    res.render('products', { products });
+    const user = req.session ? req.session.user : null;
+    res.render('products', { products, user });
   } catch (error) {
     console.error('Error al obtener los productos:', error);
     res.status(500).send('Error al obtener los productos');
@@ -78,34 +79,60 @@ router.get('/carts/:cid', async (req, res) => {
     res.status(500).send('Error al obtener los detalles del carrito: ' + error.message);
   }
 
+  // Ruta para vistas Register, Login y Profile
+  const publicAcces = (req, res, next) => {
+    if (req.session.user) return res.redirect('/profile');
+    next();
+  }
+
+  const privateAcces = (req, res, next) => {
+    if (!req.session.user) return res.redirect('/login');
+    next();
+  }
+
+
+  router.get('/register', publicAcces, (req, res) => {
+    res.render('register')
+  })
+
+  router.get('/login', publicAcces, (req, res) => {
+    res.render('login')
+  })
+
+  router.get('/profile', privateAcces, (req, res) => {
+    res.render('profile', {
+      user: req.session.user
+    })
+  })
+
 });
 
-// Inicializar el servidor de Websockets
-const socketServer = new Server();
+  // Inicializar el servidor de Websockets
+  const socketServer = new Server();
 
-// Manejar la conexión de Websockets
-socketServer.on('connection', (socket) => {
-  console.log('Cliente conectado a Websocket', socket.id);
+  // Manejar la conexión de Websockets
+  socketServer.on('connection', (socket) => {
+    console.log('Cliente conectado a Websocket', socket.id);
 
-  // Manejar la creación de un nuevo producto
-  socket.on('createProduct', (data) => {
-    productManagerInstance.addProduct(data.title, data.description, data.price, data.code, data.stock, data.category);
-    const products = productManagerInstance.getProducts();
-    socketServer.emit('productListUpdate', products); 
+    // Manejar la creación de un nuevo producto
+    socket.on('createProduct', (data) => {
+      productManagerInstance.addProduct(data.title, data.description, data.price, data.code, data.stock, data.category);
+      const products = productManagerInstance.getProducts();
+      socketServer.emit('productListUpdate', products);
+    });
+
+    // Manejar la eliminación de un producto
+    socket.on('deleteProduct', (productId) => {
+      productManagerInstance.deleteProductById(productId);
+      const products = productManagerInstance.getProducts();
+      socketServer.emit('productListUpdate', products);
+    });
+
+    // Manejar la desconexión de un cliente
+    socket.on('disconnect', () => {
+      console.log(`Cliente desconectado de Websocket`);
+    });
   });
 
-  // Manejar la eliminación de un producto
-  socket.on('deleteProduct', (productId) => {
-    productManagerInstance.deleteProductById(productId);
-    const products = productManagerInstance.getProducts();
-    socketServer.emit('productListUpdate', products); 
-  });
 
-  // Manejar la desconexión de un cliente
-  socket.on('disconnect', () => {
-    console.log(`Cliente desconectado de Websocket`);
-  });
-});
-
-
-export default router 
+  export default router 

@@ -1,18 +1,24 @@
 import express from 'express';
 
 //import { ProductManager} from './productManager.js';
-import { ProductManagerMongo } from './dao/productManagerMongo.js';
+import { ProductManagerMongo } from './dao/productManagerMongo.js'
 
-import productListRouter from './routes/productList.router.js';
-import cartRouter from './routes/cart.router.js';
-import { __dirname } from './utils.js'//Importamos Utils
-import handlebars from 'express-handlebars'//Importamos handlebars
-import viewsRouter from './routes/views.router.js' //Importamos viewsRouter
-import { Server } from 'socket.io' //Importamos socket
+import productListRouter from './routes/productList.router.js'
+import cartRouter from './routes/cart.router.js'
+import { __dirname } from './utils.js'
+import handlebars from 'express-handlebars'
+import viewsRouter from './routes/views.router.js'
+import { Server } from 'socket.io'
 
-import '../src/dao/dbConfig.js';
-import { Message } from './dao/models/messages.models.js';
+import '../src/dao/dbConfig.js'
+import { Message } from './dao/models/messages.models.js'
 
+import sessionRouter from '../src/routes/sessions.router.js'
+import cookieParser from 'cookie-parser'
+
+import session from 'express-session'
+import FileStore from 'session-file-store'
+import MongoStore from 'connect-mongo'
 
 const app = express();
 app.use(express.json());
@@ -37,6 +43,40 @@ const productManagerInstance = new ProductManagerMongo();
 //Mensaje de bienvenida al inicio
 app.get('/', (req, res) => {
   res.send('Bienvenidos a Stor3D!');
+});
+
+//Conectar Session con Filestore
+const fileStorage = FileStore(session);
+
+//Cookie & Sessions
+app.use(cookieParser());
+app.use(session({
+  store: MongoStore.create({
+    mongoUrl: 'mongodb+srv://leodebiaggi:Complot2019@ecommercestor3d.910i2dj.mongodb.net/ECOMMERCESTOR3D?retryWrites=true&w=majority',
+    mongoOptions: { useNewUrlParser: true, useUnifiedTopology: true },
+    ttl: 15,
+  }),
+  secret: "coderLeo9341",
+  resave: false,
+  saveUninitialized: false,
+}));
+
+//Ruta al api/sessions
+app.use("/api/session", sessionRouter);
+
+// Rutas para login, register y profile
+app.get('/api/views/login', (req, res) => {
+  res.render('login');
+});
+
+app.get('/api/views/register', (req, res) => {
+  res.render('register');
+});
+
+app.get('/api/views/profile', (req, res) => {
+  res.render('profile', {
+    user: req.session.user,
+  });
 });
 
 //Declaración de puerto variable + llamado al puerto 
@@ -78,5 +118,4 @@ socketServer.on('connection', (socket) => {
 
     console.log(`Mensaje guardado en la base de datos: ${user}: ${message}`);
   });
-
 });

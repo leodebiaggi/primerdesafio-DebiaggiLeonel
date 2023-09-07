@@ -10,6 +10,17 @@
 
 <body>
     <h1>Lista de Productos</h1>
+
+    <a href="/"><button>Home</button></a>
+ 
+    <div>
+        <h2>BIENVENID@</h2>
+        <p>Hola! {{user.name}}</p>
+        <p>Email: {{user.email}}</p>
+        <p>Edad: {{user.age}}</p>
+        <p>ROL: {{user.role}}</p>
+    </div>
+
     <ul>
         {{#each products}}
         <li>
@@ -28,6 +39,7 @@
             });
         });
     </script>
+    <a href="/api/session/logout"><button>Cerrar sesión</button></a>
 </body>
 
 </html>
