@@ -20,6 +20,9 @@ import session from 'express-session'
 import FileStore from 'session-file-store'
 import MongoStore from 'connect-mongo'
 
+import passport from 'passport';
+import './passport/passportStrategies.js'
+
 const app = express();
 app.use(express.json());
 app.use('/api/products', productListRouter);
@@ -55,11 +58,16 @@ app.use(session({
     mongoUrl: 'mongodb+srv://leodebiaggi:Complot2019@ecommercestor3d.910i2dj.mongodb.net/ECOMMERCESTOR3D?retryWrites=true&w=majority',
     mongoOptions: { useNewUrlParser: true, useUnifiedTopology: true },
     ttl: 15,
+    ttl: 50000,
   }),
   secret: "coderLeo9341",
   resave: false,
   saveUninitialized: false,
 }));
+
+//Passport
+app.use(passport.initialize());
+app.use(passport.session());
 
 //Ruta al api/sessions
 app.use("/api/session", sessionRouter);
@@ -76,7 +84,7 @@ app.get('/api/views/register', (req, res) => {
 app.get('/api/views/profile', (req, res) => {
   res.render('profile', {
     user: req.session.user,
-  });
+  });  
 });
 
 //Declaración de puerto variable + llamado al puerto 

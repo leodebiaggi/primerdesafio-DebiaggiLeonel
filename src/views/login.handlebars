@@ -1,24 +1,28 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <link rel="stylesheet" href="{{__dirname}}/style.css">
-    <title>Login</title> 
+    <title>Login</title>
 </head>
-<body> 
-<div>
-<div>
-    <h1>Inicia Sesión!</h1>
-    <form id="loginForm">
-        <label>Correo Electronico</label>
-        <input name="email">
-        <br>
-        <label>Contraseña</label>
-        <input name="password" type="password">
-        <input type="submit">
-    </form>
-    <p>No te encuentras registrado? <a href="/api/views/register">Registrate!</a></p>
-    </div>
-    <script src="/socket.io/socket.io.js"></script>
-    <script src="/js/login.js"></script>
+
+<body>
+    <div>
+        <div>
+            <h1>Inicia Sesión!</h1>
+            <a href="/api/session/github"><button>Ingresá con Github</button></a>
+            <form id="loginForm">
+                <label>Correo Electronico</label>
+                <input name="email">
+                <br>
+                <label>Contraseña</label>
+                <input name="password" type="password">
+                <input type="submit" value="Iniciar sesión">
+            </form>
+            <p>No te encuentras registrado? <a href="/api/views/register">Registrate!</a></p>
+        </div>
+        <script src="/socket.io/socket.io.js"></script>
+        <script src="/js/login.js"></script>
 </body>
+
 </html>
