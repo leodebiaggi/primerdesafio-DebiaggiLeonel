@@ -62,6 +62,15 @@ router.get('/logout', (req, res) => {
     })
 })
 
+// Ruta Current
+router.get('/current', (req, res) => {
+    if (req.isAuthenticated()) {
+        res.status(200).json({ user: req.user });
+    } else {
+        res.status(401).json({ error: 'Usuario no autenticado' });
+    }
+});
+
 //Llamado a Github
 
 router.get('/github', passport.authenticate('github', { scope: ['user:email'] }), async (req, res) => { })

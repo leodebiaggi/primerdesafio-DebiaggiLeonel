@@ -6,18 +6,13 @@ const collection = 'User';
 const schema = new mongoose.Schema({
   first_name: String,
   last_name: String,
-  email: String,
+  email: { type: String, unique: true },
   age: Number,
   password: String,
   username: String,
-  role: {
-    type: String,
-    default: 'usuario',
-  },
-  fromGithub: {
-    type: Boolean,
-    default: false,
-  },
+  cart: { type: mongoose.Schema.Types.ObjectId, ref: 'Cart' },
+  role: { type: String, default: 'usuario' },
+  fromGithub: { type: Boolean, default: false },
 });
 
 // Hashear password
