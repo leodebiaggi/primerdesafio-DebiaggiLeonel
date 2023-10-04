@@ -23,6 +23,8 @@ import MongoStore from 'connect-mongo'
 import passport from 'passport';
 import './passport/passportStrategies.js'
 
+import config from './config.js';
+
 const app = express();
 app.use(express.json());
 app.use('/api/products', productListRouter);
@@ -55,12 +57,12 @@ const fileStorage = FileStore(session);
 app.use(cookieParser());
 app.use(session({
   store: MongoStore.create({
-    mongoUrl: 'mongodb+srv://leodebiaggi:Complot2019@ecommercestor3d.910i2dj.mongodb.net/ECOMMERCESTOR3D?retryWrites=true&w=majority',
+    mongoUrl: process.env.MONGO_URL,
     mongoOptions: { useNewUrlParser: true, useUnifiedTopology: true },
     ttl: 15,
     ttl: 50000,
   }),
-  secret: "coderLeo9341",
+  secret: process.env.SESSION_SECRET,
   resave: false,
   saveUninitialized: false,
 }));
@@ -88,7 +90,7 @@ app.get('/api/views/profile', (req, res) => {
 });
 
 //Declaración de puerto variable + llamado al puerto 
-const PORT = 8080
+const PORT = process.env.PORT
 
 const httpServer = app.listen(PORT, () => {
   console.log(`Escuchando al puerto ${PORT}`)

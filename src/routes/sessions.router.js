@@ -1,7 +1,9 @@
 import { Router } from 'express';
 import userModel from '../dao/models/user.model.js';
 import passport from 'passport';
-import bcrypt from 'bcrypt'
+import bcrypt from 'bcrypt';
+import dotenv from 'dotenv';
+dotenv.config();
 
 const router = Router();
 
@@ -41,7 +43,7 @@ router.post('/login', async (req, res) => {
     }
 
     //Validacion Admin Coder
-    if (email === 'adminCoder@coder.com' && password === 'adminCod3r123') {
+    if (email === process.env.ADMIN_EMAIL && password === process.env.ADMIN_PASSWORD) {
         user.role = 'ADMIN';
     }
 
