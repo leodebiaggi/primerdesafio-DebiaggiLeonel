@@ -1,7 +1,7 @@
 import express from 'express';
 
 //import { ProductManager } from '../productManager.js';
-import { ProductManagerMongo } from '../dao/productManagerMongo.js';
+import { ProductManagerMongo } from '../services/productManagerMongo.js';
 import Product from '../dao/models/products.model.js';
 
 const router = express.Router();

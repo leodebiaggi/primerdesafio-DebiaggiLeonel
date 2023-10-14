@@ -1,9 +1,9 @@
 import { Router } from "express";
 //import { ProductManager } from "../productManager.js";
 import { Server } from 'socket.io';
-import { Message } from "../dao/models/messages.models.js";
-import { ProductManagerMongo } from "../dao/productManagerMongo.js";
-import Product from "../dao/models/products.model.js";
+import { Message } from '../dao/models/messages.models.js';
+import { ProductManagerMongo } from '../services/productManagerMongo.js';
+import Product from '../dao/models/products.model.js';
 import Cart from '../dao/models/carts.model.js';
 
 const router = Router();

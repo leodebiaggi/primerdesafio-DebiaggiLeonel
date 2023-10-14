@@ -1,11 +1,11 @@
 import express from 'express';
 
 //import { ProductManager} from './productManager.js';
-import { ProductManagerMongo } from './dao/productManagerMongo.js'
+import { ProductManagerMongo } from './services/productManagerMongo.js'
 
 import productListRouter from './routes/productList.router.js'
 import cartRouter from './routes/cart.router.js'
-import { __dirname } from './utils.js'
+import { __dirname } from './utils/bcrypt-helper.js'
 import handlebars from 'express-handlebars'
 import viewsRouter from './routes/views.router.js'
 import { Server } from 'socket.io'
@@ -34,7 +34,7 @@ app.use(express.static(__dirname + '/public'));
 
 // Config de HANDLEBARS
 app.engine('handlebars', handlebars.engine())
-app.set('views', __dirname + '/views')
+app.set('/api/views', 'views')
 app.set('view engine', 'handlebars')
 
 
