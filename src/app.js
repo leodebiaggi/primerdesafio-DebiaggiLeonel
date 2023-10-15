@@ -1,7 +1,7 @@
 import express from 'express';
 
 //import { ProductManager} from './productManager.js';
-import { ProductManagerMongo } from './services/productManagerMongo.js'
+import { ProductDAO } from './data/DAOs/product.dao.js';
 
 import productListRouter from './routes/productList.router.js'
 import cartRouter from './routes/cart.router.js'
@@ -10,8 +10,8 @@ import handlebars from 'express-handlebars'
 import viewsRouter from './routes/views.router.js'
 import { Server } from 'socket.io'
 
-import '../src/dao/dbConfig.js'
-import { Message } from './dao/models/messages.models.js'
+import './data/mongoDB/dbConfig.js'
+import { Message } from './data/mongoDB/models/messages.models.js'
 
 import sessionRouter from '../src/routes/sessions.router.js'
 import cookieParser from 'cookie-parser'
@@ -43,7 +43,8 @@ app.use('/api/views', viewsRouter)
 app.use('/api/realTimeProducts', viewsRouter);
 
 // const productManagerInstance = new ProductManager ("./productList.json")
-const productManagerInstance = new ProductManagerMongo();
+// const productManagerInstance = new ProductManagerMongo();
+const productManagerInstance = new ProductDAO();
 
 //Mensaje de bienvenida al inicio
 app.get('/', (req, res) => {

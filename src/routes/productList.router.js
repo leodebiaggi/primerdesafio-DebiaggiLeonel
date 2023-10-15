@@ -1,12 +1,13 @@
 import express from 'express';
 
 //import { ProductManager } from '../productManager.js';
-import { ProductManagerMongo } from '../services/productManagerMongo.js';
-import Product from '../dao/models/products.model.js';
+import { ProductDAO } from '../data/DAOs/product.dao.js'
+import Product from '../data/mongoDB/models/products.model.js';
 
 const router = express.Router();
 //const productManagerInstance = new ProductManager();
-const productManagerInstance = new ProductManagerMongo();
+// const productManagerInstance = new ProductManagerMongo();
+const productManagerInstance = new ProductDAO();
 
 // Ruta raíz GET /api/products/
 router.get('/', async (req, res) => {

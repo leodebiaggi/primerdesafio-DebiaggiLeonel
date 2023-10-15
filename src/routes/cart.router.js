@@ -1,11 +1,12 @@
 import { Router } from 'express';
 //import { CartManager } from '../cartManager.js';
-import { CartManagerMongo } from '../services/cartManagerMongo.js';
-import Cart from '../dao/models/carts.model.js';
+import { CartDAO } from '../data/DAOs/cart.dao.js'
+import Cart from '../data/mongoDB/models/carts.model.js';
 
 const router = Router();
 //const cartManagerInstance = new CartManager('./carts.json');
-const cartManagerInstance = new CartManagerMongo();
+// const cartManagerInstance = new CartManagerMongo();
+const cartManagerInstance = new CartDAO();
 
 // POST - Creación de carritos
 router.post('/', (req, res) => {
