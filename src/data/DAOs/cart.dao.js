@@ -13,7 +13,14 @@ class CartDAO {
     return await Cart.findById(id);
   }
 
-  async addProductToCart(cart, productId, quantity) {
+  async addProductToCart(cartId, productId, quantity) {
+  try {
+    const cart = await Cart.findById(cartId);
+
+    if (!cart) {
+      throw new Error('El carrito no fue encontrado');
+    }
+
     const existingProductIndex = cart.products.findIndex((p) => p.product.toString() === productId);
 
     if (existingProductIndex !== -1) {
@@ -24,7 +31,11 @@ class CartDAO {
 
     await cart.save();
     return cart;
+  } catch (error) {
+    throw new Error('Error al agregar el producto al carrito: ' + error.message);
   }
+}
+
 
   async getCartProducts(cartId) {
     return await Cart.findById(cartId).populate('products.product', 'title description price');
