@@ -5,10 +5,11 @@ import { Message } from '../data/mongoDB/models/messages.models.js';
 import { ProductDAO } from "../data/DAOs/product.dao.js";
 import Product from '../data/mongoDB/models/products.model.js';
 import Cart from '../data/mongoDB/models/carts.model.js';
+import { isUser } from "../middlewares/auth.middlewares.js";
 
 const router = Router();
 //const productManagerInstance = new ProductManager('./productList.json');
-// const productManagerInstance = new ProductManagerMongo()
+//const productManagerInstance = new ProductManagerMongo()
 const productManagerInstance = new ProductDAO()
 
 // Ruta para mostrar la vista "home.handlebars"
@@ -24,7 +25,7 @@ router.get("/realtimeproducts", (req, res) => {
 });
 
 // Ruta para mostrar la vista "Chat"
-router.get("/chat", async (req, res) => {
+router.get("/chat", isUser, async (req, res) => {
   try {
     const messages = await Message.find().sort({ createdAt: 1 });
 
@@ -107,6 +108,12 @@ router.get('/carts/:cid', async (req, res) => {
   })
 
 });
+
+//Ruta para mensajeria
+
+router.get('/messages', (req, res) =>{
+  res.render('messages');
+})
 
 // Inicializar el servidor de Websockets
 const socketServer = new Server();

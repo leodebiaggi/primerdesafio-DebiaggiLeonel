@@ -4,9 +4,11 @@ import express from 'express';
 import { ProductDAO } from '../data/DAOs/product.dao.js'
 import Product from '../data/mongoDB/models/products.model.js';
 
+import { isAdmin} from '../middlewares/auth.middlewares.js'
+
 const router = express.Router();
 //const productManagerInstance = new ProductManager();
-// const productManagerInstance = new ProductManagerMongo();
+//const productManagerInstance = new ProductManagerMongo();
 const productManagerInstance = new ProductDAO();
 
 // Ruta raíz GET /api/products/
@@ -72,7 +74,7 @@ router.get('/:pid', async (req, res) => {
 });
 
 // Ruta POST /api/products/
-router.post('/', (req, res) => {
+router.post('/', isAdmin, (req, res) => {
   //console.log('Datos de la solicitud POST:', req.body);
   const {
     title,
@@ -100,7 +102,7 @@ router.post('/', (req, res) => {
 
 
 // Ruta PUT /api/products/:pid
-router.put('/:pid', async (req, res) => {
+router.put('/:pid', isAdmin, async (req, res) => {
   try {
     const productId = req.params.pid;
     const updatedProductData = req.body;
@@ -118,7 +120,7 @@ router.put('/:pid', async (req, res) => {
 });
 
 // Ruta DELETE /api/products/:pid
-router.delete('/:pid', async (req, res) => {
+router.delete('/:pid', isAdmin, async (req, res) => {
   try {
     const productId = req.params.pid;
     const product = await productManagerInstance.getProductById(productId);

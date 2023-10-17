@@ -25,6 +25,8 @@ import './passport/passportStrategies.js'
 
 import config from './config.js';
 
+import messagesRouter from '../src/routes/messages.router.js'
+
 const app = express();
 app.use(express.json());
 app.use('/api/products', productListRouter);
@@ -74,6 +76,7 @@ app.use(passport.session());
 
 //Ruta al api/sessions
 app.use("/api/session", sessionRouter);
+app.use("/api/session/current", sessionRouter);
 
 // Rutas para login, register y profile
 app.get('/api/views/login', (req, res) => {
@@ -87,8 +90,13 @@ app.get('/api/views/register', (req, res) => {
 app.get('/api/views/profile', (req, res) => {
   res.render('profile', {
     user: req.session.user,
-  });  
+  });
 });
+
+//Mensajeria
+
+app.use('/api/messages', messagesRouter);
+app.use('/', viewsRouter);
 
 //Declaración de puerto variable + llamado al puerto 
 const PORT = process.env.PORT

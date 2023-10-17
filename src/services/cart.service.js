@@ -21,11 +21,12 @@ class CartService {
     }
   }
 
-  async getCartById(id) {
+  async getCartById(cartId) {
     try {
-      return await this.cartDAO.getCartById(id);
+      const cart = await this.cartDAO.getCartById(cartId);
+      return cart;
     } catch (error) {
-      throw new Error('Error al obtener el carrito por ID: ' + error.message);
+      throw new Error('Error al obtener el carrito');
     }
   }
 

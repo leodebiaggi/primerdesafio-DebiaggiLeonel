@@ -5,7 +5,7 @@ class ProductController {
     const { title, description, price, thumbnail, code, stock, category } = req.body;
 
     try {
-      await productService.addProduct(title, description, price, thumbnail, code, stock, category);
+      await ProductService.addProduct(title, description, price, thumbnail, code, stock, category);
       res.status(201).json({ message: 'Producto agregado exitosamente' });
     } catch (error) {
       res.status(500).json({ error: error.message });
@@ -14,7 +14,7 @@ class ProductController {
 
   async getProducts(req, res) {
     try {
-      const products = await productService.getProducts();
+      const products = await ProductService.getProducts();
       res.status(200).json({ products });
     } catch (error) {
       res.status(500).json({ error: error.message });
@@ -25,7 +25,7 @@ class ProductController {
     const { id } = req.params;
 
     try {
-      const product = await productService.getProductById(id);
+      const product = await ProductService.getProductById(id);
       if (product) {
         res.status(200).json({ product });
       } else {
@@ -41,7 +41,7 @@ class ProductController {
     const updatedFields = req.body;
 
     try {
-      const product = await productService.updateProduct(id, updatedFields);
+      const product = await ProductService.updateProduct(id, updatedFields);
       if (product) {
         res.status(200).json({ message: 'Producto actualizado exitosamente' });
       } else {
@@ -56,7 +56,7 @@ class ProductController {
     const { id } = req.params;
 
     try {
-      await productService.deleteProductById(id);
+      await ProductService.deleteProductById(id);
       res.status(200).json({ message: 'Producto eliminado exitosamente' });
     } catch (error) {
       res.status(500).json({ error: error.message });

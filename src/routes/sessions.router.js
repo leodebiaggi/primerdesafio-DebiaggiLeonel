@@ -5,6 +5,8 @@ import bcrypt from 'bcrypt';
 import dotenv from 'dotenv';
 dotenv.config();
 
+import userDTO from '../data/DTOs/user.dto.js';
+
 const router = Router();
 
 router.post('/register', async (req, res) => {
@@ -66,11 +68,8 @@ router.get('/logout', (req, res) => {
 
 // Ruta Current
 router.get('/current', (req, res) => {
-    if (req.isAuthenticated()) {
-        res.status(200).json({ user: req.user });
-    } else {
-        res.status(401).json({ error: 'Usuario no autenticado' });
-    }
+    const userDTO = new userDTO (req.session.user);
+    res.status(200).json({ user: userDTO });
 });
 
 //Llamado a Github
