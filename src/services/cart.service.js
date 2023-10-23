@@ -1,4 +1,6 @@
 import { CartDAO } from "../data/DAOs/cart.dao.js";
+import { ErrorMessages } from "../errors/errorsNum.js";
+import CustomErrors from "../errors/customErrors.js";
 
 class CartService {
   constructor() {
@@ -26,7 +28,8 @@ class CartService {
       const cart = await this.cartDAO.getCartById(cartId);
       return cart;
     } catch (error) {
-      throw new Error('Error al obtener el carrito');
+      //throw new Error('Error al obtener el carrito');
+      CustomErrors.generateError(ErrorMessages.CARTID_NOT_FOUND);
     }
   }
 

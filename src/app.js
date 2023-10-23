@@ -26,6 +26,7 @@ import './passport/passportStrategies.js'
 import config from './config.js';
 
 import messagesRouter from '../src/routes/messages.router.js'
+import { generateMockingProducts } from './mocking/productMocking.js';
 
 const app = express();
 app.use(express.json());
@@ -97,6 +98,16 @@ app.get('/api/views/profile', (req, res) => {
 
 app.use('/api/messages', messagesRouter);
 app.use('/', viewsRouter);
+
+//Mocking products (devuelve 50 productos utilizando FAKER)
+app.get('/api/mockingproducts', async (req, res) => {
+  const mockProducts = [];
+  for (let i = 0; i < 50; i++) {
+      const mockingProducts = generateMockingProducts(); 
+      mockProducts.push(mockingProducts);
+  }
+  res.json(mockProducts);
+});
 
 //Declaración de puerto variable + llamado al puerto 
 const PORT = process.env.PORT

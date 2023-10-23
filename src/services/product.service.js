@@ -1,4 +1,6 @@
 import { ProductDAO } from "../data/DAOs/product.dao.js";
+import { ErrorMessages } from "../errors/errorsNum.js";
+import CustomErrors from "../errors/customErrors.js";
 
 class ProductService {
   constructor() {
@@ -9,7 +11,9 @@ class ProductService {
     try {
       return await this.productDAO.addProduct(title, description, price, thumbnail, code, stock, category);
     } catch (error) {
-      throw new Error('Error al agregar el producto: ' + error.message);
+      //throw new Error('Error al agregar el producto: ' + error.message);
+      CustomErrors.generateError(ErrorMessages.CREATE_PRODUCT_ERROR);
+      
     }
   }
 
@@ -25,7 +29,8 @@ class ProductService {
       }
       return product;
     } catch (error) {
-      throw new Error('Error al obtener el producto por ID: ' + error.message);
+      //throw new Error('Error al obtener el producto por ID: ' + error.message);
+      CustomErrors.generateError(ErrorMessages.PRODUCTID_NOT_FOUND);
     }
   }
 

@@ -8,6 +8,8 @@ import { ProductService } from '../services/product.service.js'
 import { ticketService } from '../services/ticket.service.js';
 import { generateUniqueCode } from '../utils/codeGenerator.js';
 import Cart from '../data/mongoDB/models/carts.model.js';
+import { ErrorMessages } from '../errors/errorsNum.js';
+import CustomErrors from '../errors/customErrors.js';
 
 const router = Router();
 //const cartManagerInstance = new CartManager('./carts.json');
@@ -36,7 +38,8 @@ router.get('/:cid', async (req, res) => {
     const cartProducts = await cartManagerInstance.getCartProducts(cartId);
     return res.json(cartProducts);
   } catch (error) {
-    return res.status(500).json({ error: 'Error al obtener los productos del carrito: ' + error.message });
+    //return res.status(500).json({ error: 'Error al obtener los productos del carrito: ' + error.message });
+    CustomErrors.generateError(ErrorMessages.CARTID_NOT_FOUND);
   }
 });
 

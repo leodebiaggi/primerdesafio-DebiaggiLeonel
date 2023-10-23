@@ -1,10 +1,12 @@
 import express from 'express';
+import { ErrorMessages } from '../errors/errorsNum.js';
+import CustomErrors from '../errors/customErrors.js';
 
 //import { ProductManager } from '../productManager.js';
 import { ProductDAO } from '../data/DAOs/product.dao.js'
-import Product from '../data/mongoDB/models/products.model.js';
 
 import { isAdmin} from '../middlewares/auth.middlewares.js'
+import Product from '../data/mongoDB/models/products.model.js';
 
 const router = express.Router();
 //const productManagerInstance = new ProductManager();
@@ -64,39 +66,61 @@ router.get('/:pid', async (req, res) => {
     const product = await productManagerInstance.getProductById(productId);
 
     if (!product) {
-      return res.status(404).json({ error: 'No se ha encontrado el producto.' });
+      //return res.status(404).json({ error: 'No se ha encontrado el producto.' });
+      CustomErrors.generateError(ErrorMessages.PRODUCTID_NOT_FOUND);
     }
 
     res.json(product);
   } catch (error) {
-    res.status(500).json({ error: 'Hubo un error al obtener el producto solicitado.' });
+    //res.status(500).json({ error: 'Hubo un error al obtener el producto solicitado.' });
+    CustomErrors.generateError(ErrorMessages.PRODUCTID_NOT_FOUND);
   }
 });
 
+//Función para obtener los campos y el tipo
+function getFieldType(fieldName) {
+  const field = Product.schema.path(fieldName);
+  if (field) {
+    return field.instance;
+  }
+  return "undefined"; 
+}
 // Ruta POST /api/products/
 router.post('/', isAdmin, (req, res) => {
-  //console.log('Datos de la solicitud POST:', req.body);
-  const {
+  const { title, description, code, price, stock, category, thumbnails } = req.body;
+  const requiredFields = ['title', 'description', 'code', 'price', 'stock', 'category', 'thumbnails'];
+  const missingFields = [];
+
+  for (const field of requiredFields) {
+    if (!req.body[field]) {
+      missingFields.push(field);
+    }
+  }
+
+  if (missingFields.length > 0) {
+    const errorMessages = missingFields.map(field => {
+      const fieldType = getFieldType(field);
+      return `${field} (de tipo ${fieldType}) es requerido`;
+    });
+    return res.status(400).json({ error: ErrorMessages.CREATE_PRODUCT_ERROR, details: errorMessages });
+  }
+
+  const product = {
     title,
     description,
     code,
     price,
+    status: true,
     stock,
     category,
-    thumbnail,
-  } = req.body;
+    thumbnails: thumbnails ? thumbnails.split(',') : [],
+  };
 
-  try {
-    if (![title, description, price, thumbnail, code, stock, category].every(Boolean)) {
-      throw new Error('Todos los campos son obligatorios para agregar un producto.');
-    }
-    if (productManagerInstance.products.some((p) => p.code === code)) {
-      throw new Error(`El producto con el código '${code}' ya existe.`);
-    }
-    productManagerInstance.addProduct(title, description, price, thumbnail, code, stock, category);
-    res.status(201).json(req.body);
-  } catch (error) {
-    res.status(400).json({ error: error.message });
+  const newProduct = productManagerInstance.addProduct(product);
+  if (newProduct) {
+    res.status(201).json(newProduct);
+  } else {
+    CustomErrors.generateError(ErrorMessages.CREATE_PRODUCT_ERROR);
   }
 });
 
