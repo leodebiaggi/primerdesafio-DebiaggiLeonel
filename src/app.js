@@ -26,7 +26,9 @@ import './passport/passportStrategies.js'
 import config from './config.js';
 
 import messagesRouter from '../src/routes/messages.router.js'
-import { generateMockingProducts } from './mocking/productMocking.js';
+import { generateMockingProducts } from './mocking/productMocking.js'
+
+import logger from './utils/logger.js';
 
 const app = express();
 app.use(express.json());
@@ -108,6 +110,24 @@ app.get('/api/mockingproducts', async (req, res) => {
   }
   res.json(mockProducts);
 });
+
+
+//Ruta Test Log
+app.get('/testLog', (req, res) => {
+  logger.debug('Testing debug level message');
+  logger.http('Testing http level message');
+  logger.info('Testing info level message');
+  logger.warning('Testing warning level message');
+  logger.error('Testing error level message');
+  logger.fatal('Testing fatal level message');
+
+  res.send('Logs generados correctamente');
+});
+
+app.get('/testError', (req, res) => {
+  throw new Error('se forzo el error correctamente');
+});
+
 
 //Declaración de puerto variable + llamado al puerto 
 const PORT = process.env.PORT

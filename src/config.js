@@ -12,4 +12,5 @@ export default {
     callbackURL: process.env.GITHUB_URL_CALLBACK,
     gmail_user: process.env.GMAIL_USER,
     gmail_password: process.env.GMAIL_PASSWORD,
+    environment: process.env.NODE_ENV,
 };  

@@ -10,6 +10,7 @@ import { generateUniqueCode } from '../utils/codeGenerator.js';
 import Cart from '../data/mongoDB/models/carts.model.js';
 import { ErrorMessages } from '../errors/errorsNum.js';
 import CustomErrors from '../errors/customErrors.js';
+import logger from '../utils/logger.js';
 
 const router = Router();
 //const cartManagerInstance = new CartManager('./carts.json');
@@ -21,6 +22,7 @@ const productService = new ProductService();
 // POST - Creación de carritos
 router.post('/', (req, res) => {
   const newCart = cartManagerInstance.createCart();
+  logger.info('Carrito creado correctamente - Test Logger');
   res.status(201).json(newCart);
 });
 
@@ -39,7 +41,8 @@ router.get('/:cid', async (req, res) => {
     return res.json(cartProducts);
   } catch (error) {
     //return res.status(500).json({ error: 'Error al obtener los productos del carrito: ' + error.message });
-    CustomErrors.generateError(ErrorMessages.CARTID_NOT_FOUND);
+    CustomErrors.generateError(ErrorMessages.CARTID_NOT_FOUND)
+    logger.error('Carrito no encontrado - Test Logger');
   }
 });
 
@@ -52,6 +55,7 @@ router.post('/:cid/product/:pid', isUser, async (req, res) => {
   const cart = cartManagerInstance.addProductToCart(cartId, productId, 1); // Siempre se agregará un producto con cantidad 1
 
   if (!cart) {
+    logger.error('Carrito no encontrado - Test Logger');
     return res.status(404).json({ error: 'El carrito no fue encontrado' });
   }
 
@@ -64,8 +68,10 @@ router.delete('/:cid/products/:pid', async (req, res) => {
 
   try {
     const updatedCart = await cartManagerInstance.removeProductFromCart(cartId, productId);
+    logger.error('Carrito no encontrado - Test Logger');
     return res.status(200).json(updatedCart);
   } catch (error) {
+    logger.error('Error al eliminar el producto - Test Logger');
     return res.status(500).json({ error: error.message });
   }
 });
@@ -92,6 +98,7 @@ router.put('/:cid/products/:pid', async (req, res) => {
     const updatedCart = await cartManagerInstance.updateProductQuantityInCart(cartId, productId, quantity);
     return res.status(200).json(updatedCart);
   } catch (error) {
+    logger.error('Error al actualizar el carrito - Test Logger');
     return res.status(500).json({ error: error.message });
   }
 });
@@ -104,6 +111,7 @@ router.delete('/:cid', async (req, res) => {
     const clearedCart = await cartManagerInstance.clearCart(cartId);
     return res.status(200).json(clearedCart);
   } catch (error) {
+    logger.error('Error al eliminar todos los productos del carrito - Test Logger');
     return res.status(500).json({ error: 'Error al eliminar todos los productos del carrito: ' + error.message });
   }
 });
