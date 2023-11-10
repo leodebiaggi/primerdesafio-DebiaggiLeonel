@@ -1,32 +1,32 @@
 import express from 'express';
+import crypto from 'crypto';
+import { transporter } from './nodemailer.js';
 
-//import { ProductManager} from './productManager.js';
 import { ProductDAO } from './data/DAOs/product.dao.js';
+import productListRouter from './routes/productList.router.js';
+import cartRouter from './routes/cart.router.js';
+import { __dirname } from './utils/bcrypt-helper.js';
+import handlebars from 'express-handlebars';
+import viewsRouter from './routes/views.router.js';
+import { Server } from 'socket.io';
 
-import productListRouter from './routes/productList.router.js'
-import cartRouter from './routes/cart.router.js'
-import { __dirname } from './utils/bcrypt-helper.js'
-import handlebars from 'express-handlebars'
-import viewsRouter from './routes/views.router.js'
-import { Server } from 'socket.io'
+import './data/mongoDB/dbConfig.js';
+import { Message } from './data/mongoDB/models/messages.models.js';
 
-import './data/mongoDB/dbConfig.js'
-import { Message } from './data/mongoDB/models/messages.models.js'
+import sessionRouter from '../src/routes/sessions.router.js';
+import cookieParser from 'cookie-parser';
 
-import sessionRouter from '../src/routes/sessions.router.js'
-import cookieParser from 'cookie-parser'
-
-import session from 'express-session'
-import FileStore from 'session-file-store'
-import MongoStore from 'connect-mongo'
+import session from 'express-session';
+import FileStore from 'session-file-store';
+import MongoStore from 'connect-mongo';
 
 import passport from 'passport';
-import './passport/passportStrategies.js'
+import './passport/passportStrategies.js';
 
 import config from './config.js';
 
-import messagesRouter from '../src/routes/messages.router.js'
-import { generateMockingProducts } from './mocking/productMocking.js'
+import messagesRouter from '../src/routes/messages.router.js';
+import { generateMockingProducts } from './mocking/productMocking.js';
 
 import logger from './utils/logger.js';
 
@@ -34,54 +34,55 @@ const app = express();
 app.use(express.json());
 app.use('/api/products', productListRouter);
 app.use('/api/carts', cartRouter);
-app.use(express.urlencoded({ extended: true }))
+app.use(express.urlencoded({ extended: true }));
 app.use(express.static(__dirname + '/public'));
 
 // Config de HANDLEBARS
-app.engine('handlebars', handlebars.engine())
-app.set('/api/views', 'views')
-app.set('view engine', 'handlebars')
+app.engine('handlebars', handlebars.engine());
+app.set('/api/views', 'views');
+app.set('view engine', 'handlebars');
 
-
-//Routes viewRouter
-app.use('/api/views', viewsRouter)
+// Rutas viewRouter
+app.use('/api/views', viewsRouter);
 app.use('/api/realTimeProducts', viewsRouter);
 
 // const productManagerInstance = new ProductManager ("./productList.json")
 // const productManagerInstance = new ProductManagerMongo();
 const productManagerInstance = new ProductDAO();
 
-//Mensaje de bienvenida al inicio
+// Mensaje de bienvenida al inicio
 app.get('/', (req, res) => {
   res.send('Bienvenidos a Stor3D!');
 });
 
-//Conectar Session con Filestore
+// Conectar Session con Filestore
 const fileStorage = FileStore(session);
 
-//Cookie & Sessions
+// Cookie & Sessions
 app.use(cookieParser());
-app.use(session({
-  store: MongoStore.create({
-    mongoUrl: process.env.MONGO_URL,
-    mongoOptions: { useNewUrlParser: true, useUnifiedTopology: true },
-    ttl: 15,
-    ttl: 50000,
-  }),
-  secret: process.env.SESSION_SECRET,
-  resave: false,
-  saveUninitialized: false,
-}));
+app.use(
+  session({
+    store: MongoStore.create({
+      mongoUrl: process.env.MONGO_URL,
+      mongoOptions: { useNewUrlParser: true, useUnifiedTopology: true },
+      ttl: 15,
+      ttl: 50000,
+    }),
+    secret: process.env.SESSION_SECRET,
+    resave: false,
+    saveUninitialized: false,
+  })
+);
 
-//Passport
+// Passport
 app.use(passport.initialize());
 app.use(passport.session());
 
-//Ruta al api/sessions
-app.use("/api/session", sessionRouter);
-app.use("/api/session/current", sessionRouter);
+// Ruta al api/sessions
+app.use('/api/session', sessionRouter);
+app.use('/api/session/current', sessionRouter);
 
-// Rutas para login, register y profile
+// Rutas para login, register, profile y recuperación de contraseña
 app.get('/api/views/login', (req, res) => {
   res.render('login');
 });
@@ -96,23 +97,75 @@ app.get('/api/views/profile', (req, res) => {
   });
 });
 
-//Mensajeria
+app.get('/api/views/forgot-password', (req, res) => {
+  res.render('forgotPassword');
+});
 
+app.get('/api/views/forgot-password-sent', (req, res) => {
+  res.render('forgotPasswordSent');
+});
+
+app.get('/api/views/reset-password-success', (req, res) => {
+  res.render('resetPasswordSuccess');
+});
+
+app.get('/api/views/forgot-password-expired', (req, res) => {
+  res.render('forgotPasswordExpired');
+});
+
+app.post('/api/forgot-password', async (req, res) => {
+  const { email } = req.body;
+  const token = crypto.randomBytes(20).toString('hex');
+  const expirationTime = Date.now() + 3600000; 
+  global.passwordResetToken = { email, token, expirationTime };
+  const resetURL = `http://localhost:8080/api/views/reset-password/${token}`;
+  await transporter.sendMail({
+    from: process.env.GMAIL_USER,
+    to: email,
+    subject: 'Recuperación de Contraseña',
+    html: `Haz clic <a href="${resetURL}">aquí</a> para restablecer tu contraseña.`,
+  });
+  res.redirect('/api/views/forgot-password-sent');
+});
+
+app.get('/api/views/reset-password/:token', (req, res) => {
+  const { token } = req.params;
+  if (global.passwordResetToken && global.passwordResetToken.token === token) {
+    res.render('resetPassword', { token });
+  } else {
+    res.redirect('/api/views/forgot-password-expired');
+  }
+});
+
+app.post('/api/reset-password', (req, res) => {
+  const { token, password } = req.body;
+  if (global.passwordResetToken && global.passwordResetToken.token === token) {
+    if (password === 'la-contrasena-antigua') {
+      res.render('resetPassword', { token, error: 'La contraseña no puede ser la misma.' });
+    } else {
+      delete global.passwordResetToken;
+      res.redirect('/api/views/reset-password-success');
+    }
+  } else {
+    res.redirect('/api/views/forgot-password-expired');
+  }
+});
+
+// Mensajeria
 app.use('/api/messages', messagesRouter);
 app.use('/', viewsRouter);
 
-//Mocking products (devuelve 50 productos utilizando FAKER)
+// Mocking products (devuelve 50 productos utilizando FAKER)
 app.get('/api/mockingproducts', async (req, res) => {
   const mockProducts = [];
   for (let i = 0; i < 50; i++) {
-      const mockingProducts = generateMockingProducts(); 
-      mockProducts.push(mockingProducts);
+    const mockingProducts = generateMockingProducts();
+    mockProducts.push(mockingProducts);
   }
   res.json(mockProducts);
 });
 
-
-//Ruta Test Log
+// Ruta Test Log
 app.get('/testLog', (req, res) => {
   logger.debug('Testing debug level message');
   logger.http('Testing http level message');
@@ -120,7 +173,6 @@ app.get('/testLog', (req, res) => {
   logger.warning('Testing warning level message');
   logger.error('Testing error level message');
   logger.fatal('Testing fatal level message');
-
   res.send('Logs generados correctamente');
 });
 
@@ -128,22 +180,29 @@ app.get('/testError', (req, res) => {
   throw new Error('se forzo el error correctamente');
 });
 
-
-//Declaración de puerto variable + llamado al puerto 
-const PORT = process.env.PORT
+// Declaración de puerto variable + llamado al puerto
+const PORT = process.env.PORT;
 
 const httpServer = app.listen(PORT, () => {
-  console.log(`Escuchando al puerto ${PORT}`)
-})
+  console.log(`Escuchando al puerto ${PORT}`);
+});
 
-//Socket y eventos
+// Socket y eventos
 const socketServer = new Server(httpServer);
 
 socketServer.on('connection', (socket) => {
   console.log('Cliente conectado', socket.id);
 
   socket.on('createProduct', (data) => {
-    productManagerInstance.addProduct(data.title, data.description, data.price, data.thumbnail, data.code, data.stock, data.category);
+    productManagerInstance.addProduct(
+      data.title,
+      data.description,
+      data.price,
+      data.thumbnail,
+      data.code,
+      data.stock,
+      data.category
+    );
     const products = productManagerInstance.getProducts();
     socketServer.emit('productListUpdate', products); // Enviar actualización a todos los clientes
   });
@@ -165,7 +224,6 @@ socketServer.on('connection', (socket) => {
 
     // Emitir el mensaje a todos los clientes conectados
     socketServer.emit('chatMessage', { user, message });
-
     console.log(`Mensaje guardado en la base de datos: ${user}: ${message}`);
   });
 });

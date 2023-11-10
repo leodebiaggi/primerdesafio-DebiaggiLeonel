@@ -5,7 +5,8 @@ import CustomErrors from '../errors/customErrors.js';
 //import { ProductManager } from '../productManager.js';
 import { ProductDAO } from '../data/DAOs/product.dao.js'
 
-import { isAdmin} from '../middlewares/auth.middlewares.js'
+import { isAdmin } from '../middlewares/auth.middlewares.js'
+import { isPremium } from '../middlewares/auth.middlewares.js';
 import Product from '../data/mongoDB/models/products.model.js';
 
 import logger from '../utils/logger.js';
@@ -90,7 +91,7 @@ function getFieldType(fieldName) {
   return "undefined"; 
 }
 // Ruta POST /api/products/
-router.post('/', isAdmin, (req, res) => {
+router.post('/', isAdmin, isPremium, (req, res) => {
   const { title, description, code, price, stock, category, thumbnails } = req.body;
   const requiredFields = ['title', 'description', 'code', 'price', 'stock', 'category', 'thumbnails'];
   const missingFields = [];

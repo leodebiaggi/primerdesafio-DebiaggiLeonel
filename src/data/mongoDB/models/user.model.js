@@ -12,6 +12,7 @@ const schema = new mongoose.Schema({
   username: String,
   cart: { type: mongoose.Schema.Types.ObjectId, ref: 'Cart' },
   role: { type: String, default: 'usuario' },
+  passwordHistory: String,
   fromGithub: { type: Boolean, default: false },
 });
 
