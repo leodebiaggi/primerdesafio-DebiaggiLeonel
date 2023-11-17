@@ -1,0 +1,163 @@
+openapi: 3.0.0
+info:
+  title: API de Stor3D
+  version: 1.0.0
+paths:
+  /api/carts:
+    post:
+      summary: Creación de carritos
+      responses:
+        '201':
+          description: Carrito creado correctamente
+    get:
+      summary: Listar todos los carritos
+      responses:
+        '200':
+          description: Lista de carritos
+
+  /api/carts/{cid}:
+    get:
+      summary: Listar productos de un carrito
+      parameters:
+        - in: path
+          name: cid
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Lista de productos del carrito
+        '404':
+          description: Carrito no encontrado
+
+    post:
+      summary: Agregar producto a carrito
+      parameters:
+        - in: path
+          name: cid
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: pid
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Producto agregado al carrito
+        '404':
+          description: Carrito no encontrado
+
+    delete:
+      summary: Eliminar todos los productos del carrito
+      parameters:
+        - in: path
+          name: cid
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Productos eliminados del carrito
+        '500':
+          description: Error al eliminar productos del carrito
+
+    put:
+      summary: Actualizar el carrito
+      parameters:
+        - in: path
+          name: cid
+          required: true
+          schema:
+            type: string
+        - in: body
+          name: cartUpdate
+          required: true
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  productId:
+                    type: string
+                  quantity:
+                    type: integer
+              example:
+                productId: 'product123'
+                quantity: 2
+      responses:
+        '200':
+          description: Carrito actualizado
+        '500':
+          description: Error al actualizar el carrito
+
+  /api/carts/{cid}/products/{pid}:
+    put:
+      summary: Actualizar la cantidad de un producto en el carrito
+      parameters:
+        - in: path
+          name: cid
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: pid
+          required: true
+          schema:
+            type: string
+        - in: body
+          name: productUpdate
+          required: true
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  quantity:
+                    type: integer
+              example:
+                quantity: 3
+      responses:
+        '200':
+          description: Carrito actualizado
+        '500':
+          description: Error al actualizar el carrito
+
+    delete:
+      summary: Eliminar un producto del carrito
+      parameters:
+        - in: path
+          name: cid
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: pid
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Producto eliminado del carrito
+        '500':
+          description: Error al eliminar el producto del carrito
+
+  /api/carts/{cid}/purchase:
+    post:
+      summary: Realizar compra desde el carrito
+      parameters:
+        - in: path
+          name: cid
+          required: true
+          schema:
+            type: string
+      responses:
+        '201':
+          description: Compra exitosa
+        '404':
+          description: Carrito no encontrado
+        '400':
+          description: No hay suficiente stock para algún producto
+        '500':
+          description: Error al procesar la compra

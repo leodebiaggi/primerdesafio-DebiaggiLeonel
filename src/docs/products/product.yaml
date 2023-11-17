@@ -1,0 +1,188 @@
+openapi: 3.0.0
+info:
+  title: API de Productos de Stor3D
+  version: 1.0.0
+paths:
+  /api/products:
+    get:
+      summary: Obtener lista de productos
+      parameters:
+        - in: query
+          name: limit
+          schema:
+            type: integer
+            default: 10
+          description: Número máximo de productos a mostrar por página
+        - in: query
+          name: page
+          schema:
+            type: integer
+            default: 1
+          description: Número de página
+        - in: query
+          name: sort
+          schema:
+            type: string
+            enum: ['asc', 'desc']
+          description: Orden de la lista (ascendente o descendente)
+        - in: query
+          name: query
+          schema:
+            type: string
+          description: Filtrar por categoría
+      responses:
+        '200':
+          description: Lista de productos
+          content:
+            application/json:
+              example:
+                status: success
+                payload:
+                  - _id: "64e75a69ebf11785f98bb6de"
+                    title: "Figura 3D Test"
+                    description: "Figura 3D Test"
+                    code: "TST2"
+                    price: 8000
+                    stock: 11
+                    category: "Series"
+                    thumbnails: []
+        '500':
+          description: Error al obtener los productos
+
+    post:
+      summary: Crear un nuevo producto
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                description:
+                  type: string
+                code:
+                  type: string
+                price:
+                  type: number
+                stock:
+                  type: integer
+                category:
+                  type: string
+                thumbnails:
+                  type: array
+                  items:
+                    type: string
+              required:
+                - title
+                - description
+                - code
+                - price
+                - stock
+                - category
+                - thumbnails
+      responses:
+        '201':
+          description: Producto creado correctamente
+        '400':
+          description: Campos obligatorios incompletos
+        '403':
+          description: No autorizado para realizar esta acción
+        '500':
+          description: Error al crear el producto
+
+  /api/products/{pid}:
+    get:
+      summary: Obtener información de un producto por ID
+      parameters:
+        - in: path
+          name: pid
+          schema:
+            type: string
+          required: true
+          description: ID del producto
+      responses:
+        '200':
+          description: Información del producto
+          content:
+            application/json:
+              example:
+                _id: "64e75ad9ebf11785f98bb6e2"
+                title: "Mr White"
+                description: "Figura 3D Mr White"
+                code: "S01"
+                price: 10000
+                stock: 9
+                category: "Series"
+                thumbnails: []
+        '404':
+          description: Producto no encontrado
+
+    put:
+      summary: Actualizar información de un producto por ID
+      parameters:
+        - in: path
+          name: pid
+          schema:
+            type: string
+          required: true
+          description: ID del producto
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                description:
+                  type: string
+                price:
+                  type: number
+                stock:
+                  type: integer
+                category:
+                  type: string
+                thumbnails:
+                  type: array
+                  items:
+                    type: string
+              required:
+                - title
+                - description
+                - price
+                - stock
+                - category
+                - thumbnails
+      responses:
+        '200':
+          description: Producto actualizado correctamente
+        '400':
+          description: Campos obligatorios incompletos
+        '403':
+          description: No autorizado para realizar esta acción
+        '500':
+          description: Error al actualizar el producto
+
+    delete:
+      summary: Eliminar un producto por ID
+      parameters:
+        - in: path
+          name: pid
+          schema:
+            type: string
+          required: true
+          description: ID del producto
+      responses:
+        '200':
+          description: Producto eliminado correctamente
+        '404':
+          description: Producto no encontrado
+        '403':
+          description: No autorizado para realizar esta acción
+        '500':
+          description: Error al eliminar el producto

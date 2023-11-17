@@ -5,7 +5,7 @@ import { transporter } from './nodemailer.js';
 import { ProductDAO } from './data/DAOs/product.dao.js';
 import productListRouter from './routes/productList.router.js';
 import cartRouter from './routes/cart.router.js';
-import { __dirname } from './utils/bcrypt-helper.js';
+import { __dirname } from './bcrypt-helper.js';
 import handlebars from 'express-handlebars';
 import viewsRouter from './routes/views.router.js';
 import { Server } from 'socket.io';
@@ -29,6 +29,9 @@ import messagesRouter from '../src/routes/messages.router.js';
 import { generateMockingProducts } from './mocking/productMocking.js';
 
 import logger from './utils/logger.js';
+
+import swaggerJSDoc from "swagger-jsdoc";
+import swaggerUiExpress from "swagger-ui-express";
 
 const app = express();
 app.use(express.json());
@@ -116,7 +119,7 @@ app.get('/api/views/forgot-password-expired', (req, res) => {
 app.post('/api/forgot-password', async (req, res) => {
   const { email } = req.body;
   const token = crypto.randomBytes(20).toString('hex');
-  const expirationTime = Date.now() + 3600000; 
+  const expirationTime = Date.now() + 3600000;
   global.passwordResetToken = { email, token, expirationTime };
   const resetURL = `http://localhost:8080/api/views/reset-password/${token}`;
   await transporter.sendMail({
@@ -179,6 +182,21 @@ app.get('/testLog', (req, res) => {
 app.get('/testError', (req, res) => {
   throw new Error('se forzo el error correctamente');
 });
+
+// Swagger
+const swaggerOptions = {
+  definition: {
+    openapi: "3.0.1",
+    info: {
+      title: "Documentación de Stor3D - Leonel Debiaggi",
+      description: "Detalles sobre los métodos y funcionalidades implementados en proyecto Stor3D",
+    },
+  },
+  apis: [`${__dirname}/docs/**/*.yaml`],
+};
+const specs = swaggerJSDoc(swaggerOptions);
+
+app.use("/api/docs", swaggerUiExpress.serve, swaggerUiExpress.setup(specs));
 
 // Declaración de puerto variable + llamado al puerto
 const PORT = process.env.PORT;

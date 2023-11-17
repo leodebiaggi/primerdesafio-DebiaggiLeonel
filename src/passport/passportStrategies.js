@@ -2,7 +2,7 @@ import passport from 'passport'
 import userModel from '../data/mongoDB/models/user.model.js'
 import { Strategy as LocalStrategy } from 'passport-local'
 import { Strategy as GithubStrategy } from 'passport-github2'
-import { compareData } from '../utils/bcrypt-helper.js'
+import { compareData } from '../bcrypt-helper.js'
 import { UserService } from '../services/user.service.js'
 
 //serializeUser
