@@ -245,3 +245,5 @@ socketServer.on('connection', (socket) => {
     console.log(`Mensaje guardado en la base de datos: ${user}: ${message}`);
   });
 });
+
+export default app
