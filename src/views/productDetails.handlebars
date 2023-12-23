@@ -15,6 +15,7 @@
     <p>Precio: {{product.price}}</p>
     <p>Categoría: {{product.category}}</p>
     <button class="addToCart" data-product-id="{{product._id}}">Agregar al carrito</button>
+    <a href="/api/views/products/"><button class="button">Volver atras</button></a>
 
     <script>
         const addToCartButton = document.querySelector('.addToCart');

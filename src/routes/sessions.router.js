@@ -1,11 +1,10 @@
 import { Router } from 'express';
 import userModel from '../data/mongoDB/models/user.model.js';
+import cartModel from '../data/mongoDB/models/carts.model.js'
 import passport from 'passport';
 import bcrypt from 'bcrypt';
 import dotenv from 'dotenv';
 dotenv.config();
-
-import userDTO from '../data/DTOs/user.dto.js';
 
 const router = Router();
 
@@ -44,7 +43,31 @@ router.post('/login', async (req, res) => {
         return res.status(400).send({ status: "error", error: "Datos incorrectos" });
     }
 
-    //Validacion Admin Coder
+    // Validar si el usuario posee un carrito asignado
+    if (!user.cart) {
+        const newCart = await cartModel.create({ products: [], productsNotPurchased: [] });
+        user.cart = newCart._id;
+        await user.save();
+    }
+
+    // Ruta para asignar roles
+    router.put('/users/premium/:uid', async (req, res) => {
+        try {
+            const uid = req.params.uid;
+            const user = await userModel.findOne({ _id: uid });
+
+            if (!user) {
+                return res.status(404).json({ status: "error", error: "Usuario no encontrado" });
+            }
+            user.role = user.role === "usuario" ? "premium" : "usuario";
+            await user.save();
+            return res.status(200).json({ status: "success", message: `Rol del usuario ${user.email} actualizado a ${user.role}` });
+        } catch (error) {
+            return res.status(500).json({ status: "error", error: "Error al actualizar el rol del usuario" });
+        }
+    });
+
+    // Validacion Admin Coder
     if (email === process.env.ADMIN_EMAIL && password === process.env.ADMIN_PASSWORD) {
         user.role = 'ADMIN';
     }
@@ -54,6 +77,7 @@ router.post('/login', async (req, res) => {
         email: user.email,
         age: user.age,
         role: user.role,
+        cartId: user.cart,
     }
 
     res.redirect('/api/views/products');
@@ -68,7 +92,7 @@ router.get('/logout', (req, res) => {
 
 // Ruta Current
 router.get('/current', (req, res) => {
-    const userDTO = new userDTO (req.session.user);
+    const userDTO = new userDTO(req.session.user);
     res.status(200).json({ user: userDTO });
 });
 

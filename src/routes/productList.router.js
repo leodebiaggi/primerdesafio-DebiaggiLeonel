@@ -36,17 +36,17 @@ router.get('/', async (req, res) => {
     }
 
     const options = {
-      page: parseInt(page), 
-      limit: parseInt(limit), 
+      page: parseInt(page),
+      limit: parseInt(limit),
       sort: sortOption,
     };
 
-    const result = await Product.paginate(filter, options); 
+    const result = await Product.paginate(filter, options);
 
     const response = {
       status: 'success',
-      payload: result.docs, 
-      totalPages: result.totalPages, 
+      payload: result.docs,
+      totalPages: result.totalPages,
       prevPage: result.hasPrevPage ? result.prevPage : null,
       nextPage: result.hasNextPage ? result.nextPage : null,
       page: result.page,
@@ -88,7 +88,7 @@ function getFieldType(fieldName) {
   if (field) {
     return field.instance;
   }
-  return "undefined"; 
+  return "undefined";
 }
 // Ruta POST /api/products/
 router.post('/', isAdmin, isPremium, (req, res) => {
@@ -120,6 +120,7 @@ router.post('/', isAdmin, isPremium, (req, res) => {
     stock,
     category,
     thumbnails: thumbnails ? thumbnails.split(',') : [],
+    owner: req.user.id,
   };
 
   const newProduct = productManagerInstance.addProduct(product);

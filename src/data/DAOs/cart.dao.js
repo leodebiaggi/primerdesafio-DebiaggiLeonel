@@ -1,3 +1,4 @@
+import mongoose from 'mongoose';
 import Cart from '../mongoDB/models/carts.model.js';
 
 class CartDAO {
@@ -14,27 +15,31 @@ class CartDAO {
   }
 
   async addProductToCart(cartId, productId, quantity) {
-  try {
-    const cart = await Cart.findById(cartId);
+    try {
+      if (!mongoose.Types.ObjectId.isValid(cartId)) {
+        throw new Error('El ID del carrito no es válido.');
+      }
 
-    if (!cart) {
-      throw new Error('El carrito no fue encontrado');
+      const cart = await Cart.findById(cartId);
+
+      if (!cart) {
+        throw new Error('El carrito no fue encontrado');
+      }
+
+      const existingProductIndex = cart.products.findIndex((p) => p.product.toString() === productId);
+
+      if (existingProductIndex !== -1) {
+        cart.products[existingProductIndex].quantity += quantity;
+      } else {
+        cart.products.push({ product: productId, quantity });
+      }
+
+      await cart.save();
+      return cart;
+    } catch (error) {
+      throw new Error('Error al agregar el producto al carrito: ' + error.message);
     }
-
-    const existingProductIndex = cart.products.findIndex((p) => p.product.toString() === productId);
-
-    if (existingProductIndex !== -1) {
-      cart.products[existingProductIndex].quantity += quantity;
-    } else {
-      cart.products.push({ product: productId, quantity });
-    }
-
-    await cart.save();
-    return cart;
-  } catch (error) {
-    throw new Error('Error al agregar el producto al carrito: ' + error.message);
   }
-}
 
 
   async getCartProducts(cartId) {

@@ -33,9 +33,14 @@ class CartService {
     }
   }
 
-  async addProductToCart(cart, productId, quantity) {
+  async addProductToCart(userId, productId, quantity) {
     try {
-      return await this.cartDAO.addProductToCart(cart, productId, quantity);
+      let userCart = await this.cartDAO.getUserCart(userId);
+      if (!userCart) {
+        userCart = await this.cartDAO.createCart();
+        await this.cartDAO.associateCartWithUser(userId, userCart._id);
+      }
+      return await this.cartDAO.addProductToCart(userCart._id, productId, quantity);
     } catch (error) {
       throw new Error('Error al agregar el producto al carrito: ' + error.message);
     }

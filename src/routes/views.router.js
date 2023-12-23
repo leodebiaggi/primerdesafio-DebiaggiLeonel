@@ -6,6 +6,7 @@ import { ProductDAO } from "../data/DAOs/product.dao.js";
 import Product from '../data/mongoDB/models/products.model.js';
 import Cart from '../data/mongoDB/models/carts.model.js';
 import { isUser } from "../middlewares/auth.middlewares.js";
+import userModel from '../data/mongoDB/models/user.model.js'
 
 const router = Router();
 //const productManagerInstance = new ProductManager('./productList.json');
@@ -39,7 +40,7 @@ router.get("/chat", isUser, async (req, res) => {
 // Ruta para mostrar la vista "Products"
 router.get('/products', async (req, res) => {
   try {
-    const products = await Product.find();
+    const products = await Product.find().lean();
     const user = req.session ? req.session.user : null;
     res.render('products', { products, user });
   } catch (error) {
@@ -52,7 +53,7 @@ router.get('/products', async (req, res) => {
 router.get('/products/:pid', async (req, res) => {
   try {
     const productId = req.params.pid;
-    const product = await Product.findById(productId);
+    const product = await Product.findById(productId).lean();
 
     if (!product) {
       return res.status(404).json({ error: 'Producto no encontrado' });
@@ -111,9 +112,84 @@ router.get('/carts/:cid', async (req, res) => {
 
 //Ruta para mensajeria
 
-router.get('/messages', (req, res) =>{
+router.get('/messages', (req, res) => {
   res.render('messages');
 })
+
+// Ruta para administrar usuarios
+
+router.get('/admin/users', async (req, res) => {
+  try {
+    const users = await userModel.find({}, { username: 1, first_name: 1, last_name: 1, email: 1, role: 1 }).lean();
+    res.render('adminViews', { users: users });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+router.post('/users/:userId/updateRole', async (req, res) => {
+  const { userId } = req.params;
+  const { role } = req.body;
+
+  try {
+    await userModel.findByIdAndUpdate(userId, { role });
+    res.redirect('/admin/users');
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+router.post('/users/:userId/delete', async (req, res) => {
+  const { userId } = req.params;
+
+  try {
+    await userModel.findByIdAndDelete(userId);
+    res.redirect('/admin/users');
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Ruta para eliminar un usuario
+router.post('/admin/users/:userId/delete', async (req, res) => {
+  const { userId } = req.params;
+
+  try {
+    // Eliminar al usuario por su ID
+    await userModel.findByIdAndDelete(userId);
+
+    // Enviar correo al usuario eliminado
+    const transporter = nodemailer.createTransport({
+      service: 'gmail',
+      auth: {
+        user: process.env.GMAIL_USER,
+        pass: process.env.GMAIL_PASSWORD,
+      }
+    });
+
+    // Obtener el correo del usuario eliminado
+    const user = await userModel.findById(userId);
+    const userEmail = user.email;
+
+    // Configurar el mensaje de correo
+    const mailOptions = {
+      from: process.env.GMAIL_USER,
+      to: userEmail,
+      subject: 'Cuenta eliminada por inactividad',
+      text: 'Tu cuenta en nuestro ecommerce ha sido eliminada debido a inactividad durante los últimos 2 días.'
+    };
+
+    // Enviar el correo
+    await transporter.sendMail(mailOptions);
+
+    // Redireccionar a la vista de administración de usuarios
+    res.redirect('/api/views/admin/users');
+  } catch (error) {
+    console.error('Error al eliminar el usuario:', error);
+    res.status(500).send('Error al eliminar el usuario');
+  }
+});
+
 
 // Inicializar el servidor de Websockets
 const socketServer = new Server();

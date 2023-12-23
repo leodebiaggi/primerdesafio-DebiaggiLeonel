@@ -8,17 +8,18 @@
     <title>STOR3D - Lista de Productos</title>
 </head>
 
-<body>
+<body data-cart-id="64ef68aa0414ddb75a066d89">
     <h1>Lista de Productos</h1>
 
     <a href="/"><button>Home</button></a>
- 
+
     <div>
         <h2>BIENVENID@</h2>
         <p>Hola! {{user.name}}{{user.username}}</p>
         <p>Email: {{user.email}}</p>
         <p>Edad: {{user.age}}</p>
-        <p>ROL: {{user.role}}</p>
+        <p>Rol: {{user.role}}</p>
+        <p>Cart ID: {{user.cartId}}</p>
     </div>
 
     <ul>
@@ -26,18 +27,36 @@
         <li>
             {{this.title}} - {{this.price}}
             <a href="/api/views/products/{{this._id}}">Ver detalles</a>
-            <button class="addToCart" data-product-id="{{this._id}}">Agregar al carrito</button>
+            <button class="add-to-cart-button" data-product-id={{_id}} data-cart-id={{user.cartId}}>Agregar al carrito</button>
         </li>
         {{/each}}
     </ul>
 
     <script>
-        const addToCartButtons = document.querySelectorAll('.addToCart');
-        addToCartButtons.forEach(button => {
-            button.addEventListener('click', () => {
-                const productId = button.getAttribute('data-product-id');
-            });
-        });
+        var cartId = document.body.getAttribute("data-cart-id");
+
+        function viewDetails(productId) {
+            window.location.href = `/api/views/products/${productId}`;
+        }
+
+        function addToCart(productId, cartId) {
+            fetch(`/api/carts/${cartId}/product/${productId}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ quantity: 1 }),
+            })
+                .then(function (response) {
+                    return response.json();
+                })
+                .then(function (cart) {
+                    console.log('Producto agregado al carrito', cart);
+                })
+                .catch(function (error) {
+                    console.error('Error al agregar producto al carrito', error);
+                });
+        }
     </script>
     <a href="/api/session/logout"><button>Cerrar sesión</button></a>
 </body>

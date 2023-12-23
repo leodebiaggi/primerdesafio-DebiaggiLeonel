@@ -10,20 +10,8 @@ const productSchema = new mongoose.Schema({
   stock: Number,
   category: String,
   thumbnails: [String],
-  owner: { type: String, default: 'admin', validate: isPremium },
+  owner: { type: String, default: 'admin' }
 });
-
-async function isPremium(email) {
-  try {
-    const User = mongoose.model('User');
-    const user = await User.findOne({ email });
-
-    return user && user.role === 'premium';
-  } catch (error) {
-    console.error('Error al verificar si el usuario es premium:', error);
-    return false; 
-  }
-}
 
 productSchema.plugin(mongoosePaginate);
 

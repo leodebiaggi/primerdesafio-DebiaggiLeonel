@@ -14,6 +14,7 @@ const schema = new mongoose.Schema({
   role: { type: String, default: 'usuario' },
   passwordHistory: String,
   fromGithub: { type: Boolean, default: false },
+  lastConnection: { type: Date, default: Date.now },
 });
 
 // Hashear password

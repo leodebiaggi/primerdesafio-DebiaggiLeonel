@@ -1,27 +1,30 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <link rel="stylesheet" href="{{__dirname}}/style.css">
     <title>Profile</title>
-        <script>
+    <script>
         setTimeout(function () {
-            window.location.href = '/api/views/products'; 
-        }, 7000); 
+            window.location.href = '/api/views/products';
+        }, 5000); 
     </script>
 </head>
-<body>
-<div>
-    <h1>Acabas de ingresar a Stor3D!</h1>
-    <p>Bienvenido:{{user.name}}</p>
-    <p>{{user.email}}</p>
-    <p>{{user.age}}</p>
-    <p>{{user.role}}</p>
-    <p>En breve seras redirigido a nuestra sección de productos!</p>
 
-    <a href="/api/session/logout"><button>Cerrar sesión</button></a>
+<body>
+    <div>
+        <h1>Acabas de ingresar a Stor3D!</h1>
+        <p>Bienvenido: {{user.username}}</p>
+        <p>{{user.email}}</p>
+        <p>{{user.age}}</p>
+        <p>Rol: {{user.role}}</p>
+        <p>En breve seras redirigido a nuestra sección de productos!</p>
+
+        <a href="/api/session/logout"><button>Cerrar sesión</button></a>
     </div>
 
     <script src="/socket.io/socket.io.js"></script>
     <script src="/js/index.js"></script>
 </body>
+
 </html>

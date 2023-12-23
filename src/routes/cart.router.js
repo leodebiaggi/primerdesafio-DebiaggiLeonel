@@ -49,17 +49,22 @@ router.get('/:cid', async (req, res) => {
 
 // POST - Agregar producto a carrito
 router.post('/:cid/product/:pid', isUser, async (req, res) => {
-  const cartId = req.params.cid;
-  const productId = req.params.pid;
+  const { cartId, productId } = req.params;
 
-  const cart = cartManagerInstance.addProductToCart(cartId, productId, 1); // Siempre se agregará un producto con cantidad 1
+  // Verificar si hay un carrito en la sesión
+  if (!req.session.cartId) {
 
-  if (!cart) {
-    logger.error('Carrito no encontrado - Test Logger');
-    return res.status(404).json({ error: 'El carrito no fue encontrado' });
+    const newCart = await CartService.createCart();
+    req.session.cartId = newCart._id;
   }
 
-  res.json(cart);
+  try {
+    const result = await CartService.addProductToCart(req.session.cartId, productId);
+    res.json({ success: true, message: 'Producto agregado al carrito con éxito', result });
+  } catch (error) {
+    console.error('Error al agregar el producto al carrito:', error);
+    res.status(500).json({ success: false, message: 'Error al agregar el producto al carrito', error: error.message });
+  }
 });
 
 // DELETE /api/carts/:cid/products/:pid
@@ -143,9 +148,9 @@ router.post('/:cid/purchase', async (req, res) => {
 
     // Creación ticket
     const ticketData = {
-      code: await generateUniqueCode(), 
+      code: await generateUniqueCode(),
       purchase_datetime: new Date(),
-      amount: cart.totalAmount, 
+      amount: cart.totalAmount,
       purchaser: userDTO.email,
     };
 

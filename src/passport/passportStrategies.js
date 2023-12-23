@@ -3,7 +3,7 @@ import userModel from '../data/mongoDB/models/user.model.js'
 import { Strategy as LocalStrategy } from 'passport-local'
 import { Strategy as GithubStrategy } from 'passport-github2'
 import { compareData } from '../bcrypt-helper.js'
-import { UserService } from '../services/user.service.js'
+
 
 //serializeUser
 passport.serializeUser((usuario, done) => {
@@ -24,7 +24,7 @@ passport.deserializeUser(async (id, done) => {
 passport.use('login', new LocalStrategy(
     async function (username, password, done) {
         try {
-            const userDB = await usersManager.findUser(username)
+            const userDB = await userModel.findOne({ username: username });
             if (!userDB) {
                 return done(null, false)
             }
@@ -32,6 +32,10 @@ passport.use('login', new LocalStrategy(
             if (!isPasswordValid) {
                 return done(null, false)
             }
+            // Actualizar lastConnection
+            userDB.lastConnection = new Date();
+            await userDB.save();
+
             return done(null, userDB)
         } catch (error) {
             done(error)
@@ -48,7 +52,7 @@ passport.use('github', new GithubStrategy({
     async function (accesToken, refreshToken, profile, done) {
         try {
             // Validación existencia user en base
-            const existingUser = await usersManager.findUser(profile.username);
+            const existingUser = await userModel.findOne({ username: profile.username });
 
             if (existingUser) {
                 return done(null, existingUser);
@@ -59,11 +63,11 @@ passport.use('github', new GithubStrategy({
                 first_name: profile.displayName,
                 last_name: profile.displayName,
                 username: profile.username,
-                password: ' ', 
+                password: ' ',
                 fromGithub: true,
             };
 
-            const result = await usersManager.create(newUser);
+            const result = await userModel.create(newUser);
             return done(null, result);
         } catch (error) {
             done(error);

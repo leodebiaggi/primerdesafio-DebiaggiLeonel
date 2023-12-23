@@ -1,7 +1,6 @@
 import express from 'express';
 import crypto from 'crypto';
 import { transporter } from './nodemailer.js';
-
 import { ProductDAO } from './data/DAOs/product.dao.js';
 import productListRouter from './routes/productList.router.js';
 import cartRouter from './routes/cart.router.js';
@@ -9,29 +8,23 @@ import { __dirname } from './bcrypt-helper.js';
 import handlebars from 'express-handlebars';
 import viewsRouter from './routes/views.router.js';
 import { Server } from 'socket.io';
-
 import './data/mongoDB/dbConfig.js';
 import { Message } from './data/mongoDB/models/messages.models.js';
-
 import sessionRouter from '../src/routes/sessions.router.js';
 import cookieParser from 'cookie-parser';
-
 import session from 'express-session';
 import FileStore from 'session-file-store';
 import MongoStore from 'connect-mongo';
-
 import passport from 'passport';
 import './passport/passportStrategies.js';
-
-import config from './config.js';
-
 import messagesRouter from '../src/routes/messages.router.js';
 import { generateMockingProducts } from './mocking/productMocking.js';
-
 import logger from './utils/logger.js';
-
 import swaggerJSDoc from "swagger-jsdoc";
 import swaggerUiExpress from "swagger-ui-express";
+import userModel from './data/mongoDB/models/user.model.js';
+import userRouter from '../src/routes/users.router.js';
+import mongoose from 'mongoose';
 
 const app = express();
 app.use(express.json());
@@ -39,6 +32,9 @@ app.use('/api/products', productListRouter);
 app.use('/api/carts', cartRouter);
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(__dirname + '/public'));
+
+// Config Railway
+const connection = mongoose.connect(process.env.MONGO_URL);
 
 // Config de HANDLEBARS
 app.engine('handlebars', handlebars.engine());
@@ -84,6 +80,10 @@ app.use(passport.session());
 // Ruta al api/sessions
 app.use('/api/session', sessionRouter);
 app.use('/api/session/current', sessionRouter);
+app.use("/api/session/users/premium", sessionRouter);
+app.use("/api/users", userRouter);
+app.use("/api/users/delete", userRouter);
+app.use("/api/users/deleteInactive", userRouter);
 
 // Rutas para login, register, profile y recuperación de contraseña
 app.get('/api/views/login', (req, res) => {
@@ -154,6 +154,16 @@ app.post('/api/reset-password', (req, res) => {
   }
 });
 
+// Ruta admin de usuario
+app.get('/api/views/admin/users', async (req, res) => {
+  try {
+    const users = await userModel.find({}, 'first_name last_name email role');
+    res.render('adminViews', { users });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 // Mensajeria
 app.use('/api/messages', messagesRouter);
 app.use('/', viewsRouter);
@@ -199,7 +209,7 @@ const specs = swaggerJSDoc(swaggerOptions);
 app.use("/api/docs", swaggerUiExpress.serve, swaggerUiExpress.setup(specs));
 
 // Declaración de puerto variable + llamado al puerto
-const PORT = process.env.PORT;
+const PORT = process.env.PORT || 8080;
 
 const httpServer = app.listen(PORT, () => {
   console.log(`Escuchando al puerto ${PORT}`);
@@ -212,17 +222,9 @@ socketServer.on('connection', (socket) => {
   console.log('Cliente conectado', socket.id);
 
   socket.on('createProduct', (data) => {
-    productManagerInstance.addProduct(
-      data.title,
-      data.description,
-      data.price,
-      data.thumbnail,
-      data.code,
-      data.stock,
-      data.category
-    );
+    productManagerInstance.addProduct(data);
     const products = productManagerInstance.getProducts();
-    socketServer.emit('productListUpdate', products); // Enviar actualización a todos los clientes
+    socketServer.emit('productListUpdate', products);
   });
 
   socket.on('deleteProduct', (productId) => {

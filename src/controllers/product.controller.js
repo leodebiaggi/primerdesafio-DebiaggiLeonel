@@ -5,7 +5,10 @@ class ProductController {
     const { title, description, price, thumbnail, code, stock, category } = req.body;
 
     try {
-      await ProductService.addProduct(title, description, price, thumbnail, code, stock, category);
+      const owner = req.user ? req.user.username : (req.session.user ? req.session.user.email : 'admin');
+      const productData = { title, description, price, thumbnail, code, stock, category, owner };
+      await ProductService.addProduct(productData);
+
       res.status(201).json({ message: 'Producto agregado exitosamente' });
     } catch (error) {
       res.status(500).json({ error: error.message });

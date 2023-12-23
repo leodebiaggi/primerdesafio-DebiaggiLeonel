@@ -1,10 +1,15 @@
 import Product from '../mongoDB/models/products.model.js';
 
 class ProductDAO {
-  async addProduct(product) {
-    const newProduct = new Product(product);
-    await newProduct.save();
-    return newProduct;
+
+  async addProduct(productData) {
+    if (typeof productData === 'object' && productData.title && productData.description) {
+      const newProduct = new Product(productData);
+      await newProduct.save();
+      return newProduct;
+    } else {
+      throw new Error('Datos de producto no válidos');
+    }
   }
 
   async getProducts() {
