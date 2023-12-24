@@ -2,14 +2,15 @@ import express from 'express';
 import { ErrorMessages } from '../errors/errorsNum.js';
 import CustomErrors from '../errors/customErrors.js';
 
-//import { ProductManager } from '../productManager.js';
+
 import { ProductDAO } from '../data/DAOs/product.dao.js'
 
-import { isAdmin } from '../middlewares/auth.middlewares.js'
-import { isPremium } from '../middlewares/auth.middlewares.js';
+import { isAdmin, isPremium} from '../middlewares/auth.middlewares.js'
 import Product from '../data/mongoDB/models/products.model.js';
 
 import logger from '../utils/logger.js';
+
+import { transporter } from "../nodemailer.js";
 
 const router = express.Router();
 //const productManagerInstance = new ProductManager();
@@ -163,6 +164,14 @@ router.delete('/:pid', isAdmin, async (req, res) => {
       logger.warning('No se ha encontrado el producto que intentas eliminar - Test Logger');
       return res.status(404).json({ error: 'No se ha encontrado el producto que intentas eliminar.' });
     }
+
+    const user = req.session.user;
+    const isPremiumUser = user && user.role === 'premium';
+
+    if (isPremiumUser) {
+      await sendPremiumUserEmail(user.email, product.title);
+    }
+
     await productManagerInstance.deleteProductById(productId);
     logger.info('El producto ha sido eliminado correctamente - Test Logger');
     res.json({ message: 'El producto ha sido eliminado correctamente.' });
@@ -171,5 +180,17 @@ router.delete('/:pid', isAdmin, async (req, res) => {
     res.status(500).json({ error: 'Error al eliminar el producto.' });
   }
 });
+
+
+async function sendPremiumUserEmail(productId) {
+  const mailOptions = {
+    from: "leodebiaggi@gmail.com",
+    to: user.email,
+    subject: 'Notificación producto eliminado',
+    text: `Hola, queremos informarte que el producto ${productId} ha sido eliminado de nuestro sistema.`,
+  };
+
+  await transporter.sendMail(mailOptions);
+}
 
 export default router;
