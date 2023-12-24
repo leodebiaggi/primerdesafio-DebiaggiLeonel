@@ -34,7 +34,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.static(__dirname + '/public'));
 
 // Config Railway
-const connection = mongoose.connect(process.env.MONGO_URL);
+mongoose.connect('mongodb+srv://leodebiaggi:Complot2019@ecommercestor3d.910i2dj.mongodb.net/ECOMMERCESTOR3D?retryWrites=true&w=majority');
 
 // Config de HANDLEBARS
 app.engine('handlebars', handlebars.engine());
@@ -62,12 +62,12 @@ app.use(cookieParser());
 app.use(
   session({
     store: MongoStore.create({
-      mongoUrl: process.env.MONGO_URL,
+      mongoUrl: 'mongodb+srv://leodebiaggi:Complot2019@ecommercestor3d.910i2dj.mongodb.net/ECOMMERCESTOR3D?retryWrites=true&w=majority',
       mongoOptions: { useNewUrlParser: true, useUnifiedTopology: true },
       ttl: 15,
       ttl: 50000,
     }),
-    secret: process.env.SESSION_SECRET,
+    secret: 'coderLeo9341',
     resave: false,
     saveUninitialized: false,
   })

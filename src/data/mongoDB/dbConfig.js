@@ -3,7 +3,7 @@ import dotenv from 'dotenv';
 dotenv.config(); 
 
 //CONFIG MONGOOSE
-const URI = process.env.MONGO_URL;
+const URI = 'mongodb+srv://leodebiaggi:Complot2019@ecommercestor3d.910i2dj.mongodb.net/ECOMMERCESTOR3D?retryWrites=true&w=majority';
 mongoose.connect(URI)
 .then(()=> console.log('conectado a la base de datos'))
 .catch((error) => {
